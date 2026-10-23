@@ -9,7 +9,7 @@ into each picture so the layout can draw arrows and magnifier call-outs on top o
 TITLE = "Finder Puck"
 SUBTITLE = "Build Guide"
 VARIANT = "Round-screen puck, through-bolted"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 BRAND = {
     "name": "RESEARCH + DESIRE",
     "logo": "assets/rad-logo.png",
@@ -48,6 +48,8 @@ PARTS = {
     "washer":  ("hardware", "Washer M2.5", 4, "nylon DIN 433, 5 × 2.7 × 0.5 mm", "card_washer"),
     "oring":   ("hardware", "O-ring", 1, "9 × 1 mm silicone", "card_oring"),
     "doorgasket": ("hardware", "Door gasket", 1, "0.5 mm closed-cell foam frame, 15.9 × 9.4 mm, 13.7 × 7.2 mm hole", "card_doorgasket"),
+    "crystalgasket": ("hardware", "Crystal gasket", 1, "0.3 mm closed-cell foam ring, Ø35.2–37.2 mm", "card_crystalgasket"),
+    "lidgasket": ("hardware", "Lid gasket", 1, "0.3 mm closed-cell foam, cut from the template", "card_lidgasket"),
 }
 PART_GROUPS = (("printed", "3D printed"), ("electronics", "Electronics"), ("hardware", "Hardware"))
 
@@ -60,7 +62,6 @@ TOOLS = (
     ("required", "Multimeter", "meter"),
     ("required", "Super glue", "glue"),
     ("required", "USB-C cable and a computer", "usb"),
-    ("required", "Clear UV resin and a UV torch", "uv"),
     ("recommended", "Magnifier", "loupe"),
     ("recommended", "Isopropyl alcohol", "ipa"),
     ("recommended", "Kapton tape", "tape"),
@@ -76,8 +77,9 @@ BEFORE = (
               "0.25 mm. Print the door standing on its edge and the switch plug in TPU, standing on its strap end. Print a hole coupon before "
               "trusting the insert holes."),
     ("Sealing", "The puck is built to IP55 (dust, water jets). That holds only with every seal in: the seam seal, "
-                "a washer under each bolt head, the O-ring on the cap, UV resin round the crystal and the bezel, "
-                "resin in the pinhole, the door slid shut and the switch plug pushed fully home. Cut the seam seal with a compass cutter."),
+                "a washer under each bolt head, the O-ring on the cap, the crystal and lid gaskets, the door slid shut "
+                "and the switch plug pushed fully home. Cut the seam seal with a compass cutter; print "
+                "case/finder_puck_gaskets.svg at 100 % and cut the lid, crystal and door gaskets along it."),
     ("Panel first", "Buy two panels. Before anything else, look at the flex: after it folds under the glass, pin 1 "
                     "must land on the 3 o'clock side of the board's pads. If yours is mirrored, the board needs "
                     "regenerating with FPC_PIN1_RIGHT flipped, not a different fold."),
@@ -128,18 +130,19 @@ STEPS = (
          arrows=[("blead_from", "blead_to", "straight")],
          mags=[("s09_mag_j2", "j2", "tl", "battery  +  –")],
          note="Now plug in the battery. Check the lead with the meter first: + is marked on the board next to the socket.", tool="meter"),
-    dict(scene="s10", parts=[("gasket", 1), ("crystal", 1)],
-         arrows=[("gasket_from", "gasket_to", "straight"), ("crystal_from", "crystal_to", "straight")],
+    dict(scene="s10", parts=[("gasket", 1), ("crystal", 1), ("crystalgasket", 1)],
+         arrows=[("gasket_from", "gasket_to", "straight"), ("crystal_from", "crystal_to", "straight"),
+                 ("cgasket_from", "cgasket_to", "straight")],
          mags=[],
-         note="Blow the dust off the glass first. The crystal rests on the ring, not on the panel. Run a thin bead of UV resin round the crystal's top edge, but do not cure it yet."),
-    dict(scene="s11", parts=[("bezel", 1)],
-         arrows=[("bezel_from", "bezel_to", "straight")],
-         mags=[("s11_mag", "pipe", "tr", "")],
-         note="The four light pipes drop over the LEDs; the bezel seats over the ring and holds the crystal. Cure the resin through the clear lip with the UV torch.", tool="uv"),
-    dict(scene="s12", parts=[("cap", 1), ("oring", 1)],
+         note="Blow the dust off the glass first. The crystal rests on the ring, not on the panel. Lay the crystal gasket on the glass's edge, centred, adhesive side up: it sticks to the bezel's lip and comes off with the lid."),
+    dict(scene="s11", parts=[("cap", 1), ("oring", 1)],
          arrows=[("cap_from", "cap_to", "straight")],
-         mags=[("s12_mag", "cap_to", "tl", "")],
-         note="Roll the O-ring into the cap's groove and grease it. The square pocket in the cap fits the switch stem; a dot of glue in the pocket keeps it on."),
+         mags=[("s11_mag", "cap_to", "tl", "")],
+         note="Roll the O-ring into the cap's groove and grease it. The square pocket in the cap fits the switch stem; a dot of glue in the pocket keeps it on. The cap goes on before the bezel, whose sleeve holds it."),
+    dict(scene="s12", parts=[("bezel", 1), ("lidgasket", 1)],
+         arrows=[("bezel_from", "bezel_to", "straight")],
+         mags=[("s12_mag", "pipe", "tr", "")],
+         note="Stick the lid gasket on the bezel's flange first: lobe round the button sleeve, tab on the charge-LED pipe. Lower the bezel straight down: the light pipes drop over the LEDs, the sleeve slides over the cap's O-ring, and the bezel seats over the ring and holds the crystal."),
     dict(scene="s13", parts=[],
          arrows=[("sw_from", "sw_to", "straight"), ("usb_from", "usb_to", "straight")],
          mags=[],
@@ -147,16 +150,16 @@ STEPS = (
     dict(scene="s14", parts=[("seal", 1), ("door", 1), ("doorgasket", 1), ("plate", 1), ("washer", 4), ("bolt", 4)],
          arrows=[("seal_from", "seal_to", "straight"), ("door_from", "door_to", "straight"), ("plate_from", "plate_to", "straight")] + [("bolt%d_from" % i, "bolt%d_to" % i, "straight") for i in (1, 2, 3, 4)],
          mags=[("s14_mag", "bolt2_to", "tl", "")],
-         note="Stick the seal on the shell rim, its ends against the USB-C opening. Stick the gasket frame inside the door and hook the door into the groove under the opening, slid shut. Run UV resin round the bezel where it meets the plate, lower the plate over the bezel and cap, then the bolts, each on a washer. Hand-tight only, in a cross: aluminium sockets strip. Cure through the lip.", tool="hexkey"),
+         note="Stick the seal on the shell rim, ends against the USB-C opening. Stick the gasket frame inside the door and hook the door into the lower groove, slid shut. Lower the plate, then the bolts on their washers: hand-tight, in a cross (aluminium sockets strip).", tool="hexkey"),
     dict(scene="s15", parts=[("index", 1), ("cord", 1), ("swplug", 1)],
          arrows=[("index_from", "index_to", "straight"), ("cord_from", "cord_to", "straight"),
                  ("swplug_from", "swplug_to", "straight")],
          mags=[("s15_mag", "index_to", "br", "")],
-         note="Glue the orange stub into the hole at 12 o'clock all round and trim it flush; fill the pinhole flush with UV resin and cure it. Glue the switch plug's pin into the hole under the slot and push the plug home. Thread the cord in one mouth and out the other, then knot it.", tool="glue"),
+         note="Glue the orange stub into the blind hole at 12 o'clock and trim it flush. Glue the switch plug's pin into the hole under the slot and push the plug home. Thread the cord in one mouth and out the other, then knot it.", tool="glue"),
     dict(scene="s16", parts=[],
          arrows=[("sw_from", "sw_to", "straight"), ("usb_from", "usb_to", "straight")],
          mags=[],
-         note="Lift the switch plug and slide the switch toward the dot to switch on. Charge through USB-C with the puck off and dry; the pinhole LED goes out when the cell is full. Slide the door shut (towards 3 o'clock) and push the switch plug home before the puck gets wet. Mark it 1 or 2 on the back with the paint pen.", tool="pen"),
+         note="Lift the switch plug and slide the switch toward the dot to switch on. Charge with the puck off and dry; the light just below 3 o'clock goes out when full. Shut the door and push the switch plug home before it gets wet. Mark it 1 or 2 on the back.", tool="pen"),
 )
 
 # The last page before the back cover.

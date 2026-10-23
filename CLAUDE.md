@@ -34,12 +34,13 @@ vendored as `tools/kicad_helpers.py`; its own Digital Sand paths are unused or o
   `finder_puck.kicad_pro` when it quits and leaves `.kicad_prl` and `.lck` files: restore the project file with
   `git checkout finder_puck.kicad_pro` afterwards.
 - Case: `case/build_case.py` (freecadcmd) builds shell, plate, ring, bezel, cap, the sliding USB-C door and the
-  TPU switch plug, plus the bolts, washers, inserts, index stub, flex antenna, seam seal, O-ring, door gasket and interference proxies as
-  reference solids, from `mech/`. It must report 0 interferences, its `gap` lines (every printed-vs-other pair under
+  TPU switch plug, plus the bolts, washers, inserts, index stub, flex antenna, seam seal, O-ring, door, crystal and lid
+  gaskets and interference proxies as reference solids, from `mech/`, and the 1:1 gasket template `case/finder_puck_gaskets.svg`. It must report 0 interferences, its `gap` lines (every printed-vs-other pair under
   0.3 mm) must be designed seats only, its `squeeze` line (the switch plug's 0.1 mm press fit) non-zero, its `door open` lines
   free of overlap, and its `mesh`
   lines must say closed, 0 self-intersections. IP55 depends on every seal in README "Sealing (IP55)"; a change
-  that opens a new path into the case (an opening across the seam, a through hole) needs a seal of its own. The script only builds when run as `build_case.py` (freecadcmd never sets
+  that opens a new path into the case (an opening across the seam, a through hole) needs a seal of its own, a clamped
+  gasket or O-ring rather than glue (the lid must stay serviceable). The script only builds when run as `build_case.py` (freecadcmd never sets
   `__main__`); the renderers import it for the parameters. Previews need the FreeCAD GUI:
   `open -n -a FreeCAD --args <abs path>/case/render_case.py`.
 - Build guide: `manual/manual_steps.py` is the content (parts, tools, steps), `manual/render_manual.py` makes the

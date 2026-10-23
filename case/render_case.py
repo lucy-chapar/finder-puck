@@ -28,7 +28,7 @@ COLORS = {
     "Board": ((0.08, 0.09, 0.08), 0), "Panel": ((0.03, 0.08, 0.05), 0), "Crystal": ((0.8, 0.9, 1.0), 80),
     "Battery": ((0.75, 0.72, 0.62), 0), "Motor": ((0.6, 0.6, 0.62), 0), "Antenna": ((0.8, 0.65, 0.2), 0),
     "Door": ((0.13, 0.13, 0.14), 0), "DoorGasket": ((0.05, 0.05, 0.05), 0), "SwitchPlug": ((0.13, 0.13, 0.14), 0), "Seal": ((0.05, 0.05, 0.05), 0),
-    "ORing": ((0.80, 0.25, 0.15), 0),
+    "ORing": ((0.80, 0.25, 0.15), 0), "CrystalGasket": ((0.05, 0.05, 0.05), 0), "LidGasket": ((0.05, 0.05, 0.05), 0),
 }
 for _i in range(1, 5):
     COLORS["Bolt%d" % _i] = ORANGE
@@ -72,7 +72,8 @@ for _ in range(4):
     settle()
 ALL = list(COLORS)
 BOLTS = ["Bolt%d" % i for i in range(1, 5)]
-CLOSED = ["Shell", "Plate", "Ring", "Bezel", "Cap", "Crystal", "Panel", "Index", "Door", "SwitchPlug", "Seal"] + BOLTS
+CLOSED = ["Shell", "Plate", "Ring", "Bezel", "Cap", "Crystal", "Panel", "Index", "Door", "SwitchPlug", "Seal", "CrystalGasket",
+          "LidGasket"] + BOLTS
 shot("case-closed.png", CLOSED, "viewIsometric")
 shot("case-side.png", CLOSED, "viewFront")
 shot("case-face.png", CLOSED + ["Board"], "viewTop")

@@ -7,13 +7,14 @@ Five printed parts clamp together with four M2.5 screws that pass through the PC
                                 lanyard tunnel, USB-C / switch / lead notches, debossed
                                 radar dial and name on the underside
   PLATE  (top, black)           bolt bosses with counterbored heads, covered sky window over
-                                the GPS patch, button bore, charge-LED pinhole, orange index
-                                dot at 12 o'clock, pocket for the bezel flange
+                                the GPS patch, button bore, charge-LED pipe bore, orange index
+                                dot at 12 o'clock, pocket for the bezel flange and lid gasket
   RING   (black)                a short cup standing on the board: the panel's ledge.  Open
                                 at 6 o'clock for the panel chin and FPC, low over the ESP32
   BEZEL  (translucent)          sits on the ring: crystal seat, the visible lip, the flange
-                                the plate clamps, and four light pipes down to the LEDs
-  CAP    (orange)               the single button, sealed by an O-ring in a sleeve under the skin
+                                the plate clamps, four light pipes down to the LEDs, a light
+                                pipe up from the charge LED, and the button bore's sleeve
+  CAP    (orange)               the single button, sealed by an O-ring in the bezel's sleeve
   DOOR   (black)                slides round the wall over the USB-C opening; its gasket seals on a land
   SWITCH PLUG (TPU)             tethered cover for the switch slot
 
@@ -22,12 +23,13 @@ ledge below it and a lip above it, so the stack is now: ring, panel, gasket, cry
 
 Sealed to IP55 (dust protected, water jets): a closed-cell foam seal compressed between the shell's
 rim and the plate's skirt, nylon washers under the bolt heads, an O-ring on the button cap, the USB-C
-door's gasket, the switch plug, and the crystal and bezel bonded with UV resin.  Every path in ends at one of those
+door's gasket, the switch plug, and die-cut foam gaskets under the bezel's lip (on the crystal) and on its flange
+(under the plate).  Nothing is glued: the lid comes off with the four bolts.  Every path in ends at one of those
 (see "Sealing (IP55)" in the README).
 
 Modelled hardware (not printed): four M2.5 x 12 socket caps, their nylon washers, four inserts, the
-orange index stub, the panel, crystal, battery, motor, the flex antenna, the seam seal and the
-button's O-ring (both drawn compressed).  Proxies (not in the board model
+orange index stub, the panel, crystal, battery, motor, the flex antenna, the seam seal, the
+button's O-ring and the door, crystal and lid gaskets (all drawn compressed).  Proxies (not in the board model
 either) for the mated battery plug, the three cables through the board notch, the FPC fold, the
 USB plug's overmold and the GPS module at its tolerance limits.  Every printed part is checked
 for interference against all of these, and every printed-vs-other pair closer than REPORT_GAP is
@@ -109,9 +111,9 @@ LIP_T, LIP_H, LAP_GAP = R_LAP1 - R_LAP0, 1.5, 0.25   # 0.65 thick, 1.5 tall, 0.2
 R_SKIRT_IN = R_LAP1 + LAP_GAP    # 36.7: plate skirt 1.5 wide over the seal
 SEAL_T, SEAL_INSET = 1.0, 0.05   # closed-cell foam seal on the shell rim, 1.0 mm thick ...
 PLATE_GAP = 0.6                  # ... squeezed to the rim gap (40 %): the bosses are still the datum, not the rim
-Z_FACE = 8.0
+Z_FACE = 8.6                     # 0.6 mm over the board's 8.0, so every lid seal is a clamped gasket
 SKIN = 1.6
-Z_SKIN = Z_FACE - SKIN           # 6.4
+Z_SKIN = Z_FACE - SKIN           # 7.0
 # Bolts: M2.5 x 12 socket caps (anodised aluminium, head 4.5 x 2.5) through the PCB into inserts.
 BOSS_R = BOLTS["boss_r"]         # 3.75
 BOLT_CLEAR = 3.0
@@ -131,6 +133,9 @@ Z_PANEL_TOP = LEDGE_Z + PANEL_T  # 5.5
 Z_CRYSTAL = Z_PANEL_TOP + GASKET # 5.7
 CRYSTAL_D, CRYSTAL_T = PANEL["crystal_dia"], PANEL["crystal_thickness"]   # 37.5 x 1.0
 Z_CRYSTAL_TOP = Z_CRYSTAL + CRYSTAL_T   # 6.7
+CRYSTAL_GASKET = 0.2             # a 0.3 mm die-cut foam ring on the glass under the lip, modelled compressed
+CRYSTAL_GASKET_R = (17.6, 18.6)  # inside the lip's overlap of the glass (r 17.4-18.75), outside the panel's window
+Z_LIP0 = Z_CRYSTAL_TOP + CRYSTAL_GASKET   # 6.9: lip underside
 WINDOW_D = min(PANEL["window_dia"], PANEL["glass_dia"] - 0.4)   # 34.8: the lip overlaps the glass by 0.2, hiding its edge
 R_WALL0, R_WALL1 = F["ring_wall"]["r0"], F["ring_wall"]["r1"]   # 17.9, 18.6: footprint keep-out on the board
 WALL_GAPS = F["ring_wall"]["gaps"]
@@ -151,16 +156,21 @@ R_BEZEL_GPS = R_BEZEL_IN - 0.3   # 18.7: the bezel's GPS cut starts here, 0.5 mm
 R_LIP1 = 21.7                    # flared lip: the visible translucent dial ring
 LIP_PROUD = 0.0                  # lip top above the face: 1.5-2.0 makes the beacon visible from the side (see README)
 R_OPENING = 22.0                 # plate opening (0.3 mm reveal around the lip)
-R_FLANGE1 = 26.0                 # bezel flange under the plate skin
-Z_FLANGE0, Z_FLANGE1 = Z_SKIN, Z_SKIN + 0.8
-GPS_FLANGE_GAP = (60, 120)       # over the GPS module the flange is only 0.4 mm thick
+R_FLANGE1 = 26.0                 # bezel flange under the plate skin, all the way round (0.2 mm over a 6.8 mm GPS module)
+Z_FLANGE0, Z_FLANGE1 = Z_SKIN, Z_SKIN + 0.5
+# Lid gasket: a die-cut 0.3 mm foam sheet on the flange, squeezed between it and the plate's pocket ceiling.
+# It rings the opening, with a lobe round the button bore and a tab round the charge-LED pipe.
+LID_GASKET, LID_INSET = 0.2, 0.3 # modelled compressed; inset from the flange's edges (the pocket is as much outside them)
+Z_POCKET = Z_FLANGE1 + LID_GASKET   # 7.7: pocket ceiling, 0.9 mm under the face
+BUTTON_LOBE = 7.4                # flange lobe round the button, which carries the bore's sleeve
+LOBE_HOLE = 5.6                  # the gasket's hole round the bore (bore radius 5.3): a 1.5 mm web to the lobe's edge
 PIPE_D, PIPE_Z0 = 3.0, 1.2       # light pipes from 0.3 mm above the LEDs up into the flange
 # Openings.
-GPS_WINDOW = "skin"              # "skin" (0.8 mm cover over the patch) or "open" (hole to the sky)
-GPS_COVER = 0.8
+GPS_WINDOW = "skin"              # "skin" (0.9 mm cover over the patch) or "open" (hole to the sky)
+GPS_COVER = Z_FACE - Z_POCKET    # 0.9
 GPS_WIN = (27.25, 0.4, 44.75, 15.2)          # board coords of the thinned area, out to the wall (module top 6.35)
 GPS_WIN_R = 2.0                  # keeps the window inside the plate wall; 1 mm from the patch corner to the step
-INDEX_R, INDEX_D, INDEX_DEPTH = 34.7, 1.8, GPS_COVER   # 12 o'clock mark: a glued 1.75 mm orange filament stub, through the cover
+INDEX_R, INDEX_D, INDEX_DEPTH = 34.7, 1.8, 0.6   # 12 o'clock mark: a glued 1.75 mm orange filament stub in a blind hole
 USB_W, USB_Z0, USB_Z1 = 13.5, -1.8, 5.2      # 12.35 x 6.5 plug overmold, centred on the receptacle axis (Z 1.65-1.78)
 SWITCH_W, SWITCH_Z0, SWITCH_Z1 = 7.0, -0.5, 1.8   # knob at Z 0.45-1.25: the slot stays in the shell, under the seal
 SCALLOP_W, SCALLOP_D = 10.0, 1.0            # finger scallop outside the switch slot: the knob sits 0.7 mm in
@@ -199,12 +209,15 @@ FLEX_ARC, FLEX_Z, FLEX_T = (15, 90), (-7.2, -0.2), 0.2
 BUTTON = F["button"]
 CAP_D, CAP_BORE, CAP_PROUD, CAP_FLANGE_D = 10.0, 10.6, 1.5, 12.4
 CAP_SOCKET, CAP_SOCKET_DEPTH = 3.7, 1.0     # pocket for the PTS645 stem
-# The button bore continues down a sleeve under the skin, and a 9 x 1 mm silicone O-ring in a groove on the
-# cap seals against it (gland depth 0.8: 20 % squeeze).  The cap's flange stays captive under the sleeve.
-SLEEVE_R, SLEEVE_Z0, SLEEVE_LEAD = 5.9, 5.2, 0.4   # outer radius (0.4 mm clear of the bezel lip), bottom, lead-in
+# The button bore continues down a sleeve under the bezel's lobe, and a 9 x 1 mm silicone O-ring in a groove on
+# the cap seals against it (gland depth 0.8: 20 % squeeze).  The cap's flange stays captive under the sleeve.
+SLEEVE_R, SLEEVE_Z0, SLEEVE_LEAD = 5.9, 5.2, 0.4   # outer radius, bottom, lead-in
 ORING_GROOVE = (4.5, 6.0, 7.3)               # groove bottom radius, Z from, Z to (upper wall 45 degrees)
 ORING_CS = 1.0
-PINHOLE_D = 1.2
+# Charge LED: a light pipe on a tab of the bezel's flange, up through the skin to the face.
+LED_PIPE_D, LED_PIPE_BORE = 1.2, 1.4         # pipe, its bore in the skin
+LED_FOOT_D, LED_FOOT_Z0 = 1.6, 1.45          # thicker below the flange, 0.3 mm over the LED (top at 1.15)
+LED_TAB_W, LED_TAB_R = 4.0, 2.3              # tab width, round end about the pipe
 # Underside deboss.
 DEBOSS_ART, DEBOSS_TEXT = 0.3, 0.4
 TEXT_H = 3.5                                 # cap height; DejaVu Bold gives a 0.6 mm stroke
@@ -476,9 +489,10 @@ def make_plate():
         px, py = pt(x, y)
         body = body.cut(cyl(BOLT_CLEAR / 2, -1, Z_FACE + 1, px, py))
         body = body.cut(cyl(CBORE_D / 2, Z_FACE - (HEAD_H - HEAD_PROUD) - WASHER_T, Z_FACE + 1, px, py))
-    # Bezel: opening through the face and the pocket for its flange.
+    # Bezel: opening through the face and the pocket for its flange and the lid gasket on it.
     body = body.cut(cyl(R_OPENING, Z_SKIN - 1, Z_FACE + 1))
-    body = body.cut(annulus(R_OPENING - 0.5, R_FLANGE1 + 0.3, Z_SKIN - 1, Z_FLANGE1))
+    body = body.cut(annulus(R_OPENING - 0.5, R_FLANGE1 + LID_INSET, Z_SKIN - 1, Z_POCKET).fuse(
+        flange_extras(LID_INSET, Z_SKIN - 1, Z_POCKET)))
     # GPS sky window: the skin thins to a cover over the patch (or opens, if GPS_WINDOW == "open").
     if GPS_WINDOW == "open":
         body = body.cut(board_rect(*GPS_WIN, Z_SKIN - 1, Z_FACE + 1, GPS_WIN_R))
@@ -486,16 +500,14 @@ def make_plate():
         body = body.cut(board_rect(*GPS_WIN, Z_SKIN - 1, Z_FACE - GPS_COVER, GPS_WIN_R))
     # 12 o'clock index: blind hole for the orange stub.
     body = body.cut(cyl(INDEX_D / 2, Z_FACE - INDEX_DEPTH, Z_FACE + 1, CX, CY + INDEX_R))
-    # Button bore down a sleeve under the skin (the O-ring's bore, with a lead-in at its mouth), the charge-LED
-    # pinhole, and a dimple that marks the ON end of the switch slot.
+    # Button bore through the skin (the bezel's sleeve continues it), the charge-LED pipe's bore, and a dimple
+    # that marks the ON end of the switch slot.
     bx, by = pt(*BUTTON["center"])
-    body = body.fuse(cyl(SLEEVE_R, SLEEVE_Z0, Z_FLANGE1 + 0.01, bx, by))
-    body = body.cut(cyl(CAP_BORE / 2, SLEEVE_Z0 - 1, Z_FACE + 1, bx, by))
-    body = body.cut(Part.makeCone(CAP_BORE / 2 + SLEEVE_LEAD, CAP_BORE / 2, SLEEVE_LEAD, V(bx, by, SLEEVE_Z0)))
+    body = body.cut(cyl(CAP_BORE / 2, Z_SKIN - 1, Z_FACE + 1, bx, by))
+    dx, dy = pt(*F["charge_led"]["center"])
+    body = body.cut(cyl(LED_PIPE_BORE / 2, Z_SKIN - 1, Z_FACE + 1, dx, dy))
     ox, oy = at(F["power_switch"]["angle"] - 6, R_IN - 1.9)
     body = body.cut(cyl(0.6, Z_FACE - 0.3, Z_FACE + 1, ox, oy))
-    dx, dy = pt(*F["charge_led"]["center"])
-    body = body.cut(cyl(PINHOLE_D / 2, Z_SKIN - 1, Z_FACE + 1, dx, dy))
     # The USB-C opening continues up through the skirt (the switch slot stays in the shell), with the door's
     # pocket and upper groove round it.
     body = body.cut(radial_box(F["usb"]["angle"], R_BOARD - 1.0, R_OUT + 2, USB_W, USB_Z0, USB_Z1))
@@ -525,14 +537,22 @@ def make_ring():
     return largest_solid(ring.removeSplitter())
 
 
+def flange_extras(grow, z0, z1):
+    """The bezel flange's lobe round the button and its tab out to the charge LED, grown by grow (the plate's
+    pocket) or shrunk (the lid gasket)."""
+    bx, by = pt(*BUTTON["center"])
+    dx, dy = pt(*F["charge_led"]["center"])
+    a = math.degrees(math.atan2(dy - CY, dx - CX))
+    tab = radial_box(a, R_FLANGE1 - 1.0, math.hypot(dx - CX, dy - CY), LED_TAB_W + 2 * grow, z0, z1)
+    return cyl(BUTTON_LOBE + grow, z0, z1, bx, by).fuse([tab, cyl(LED_TAB_R + grow, z0, z1, dx, dy)])
+
+
 def make_bezel():
-    """Translucent bezel: crystal seat, flared lip, clamp flange, skirt around the ring, light pipes."""
-    body = annulus(R_BEZEL_IN, R_BEZEL1, Z_CRYSTAL, Z_CRYSTAL_TOP)
-    lip = annulus(WINDOW_D / 2, R_LIP1, Z_CRYSTAL_TOP, Z_FACE + LIP_PROUD)
-    flange = annulus(R_BEZEL1 - 0.01, R_FLANGE1, Z_FLANGE0, Z_FLANGE1)
-    # Over the GPS module (top at Z 6.35) only the upper 0.4 mm of the flange remains.
-    flange = flange.cut(sector(R_BEZEL1 + 0.01, R_FLANGE1 + 1, GPS_FLANGE_GAP[0], GPS_FLANGE_GAP[1],
-                               Z_FLANGE0 - 1, Z_CRYSTAL_TOP))
+    """Translucent bezel: crystal seat, flared lip, clamp flange, skirt around the ring, light pipes, and the
+    button bore's sleeve."""
+    body = annulus(R_BEZEL_IN, R_BEZEL1, Z_CRYSTAL, Z_LIP0)
+    lip = annulus(WINDOW_D / 2, R_LIP1, Z_LIP0, Z_FACE + LIP_PROUD)
+    flange = annulus(R_BEZEL1 - 0.01, R_FLANGE1, Z_FLANGE0, Z_FLANGE1).fuse(flange_extras(0.0, Z_FLANGE0, Z_FLANGE1))
     skirt = annulus(R_SKIRT0, R_BEZEL1, Z_SKIRT0, Z_CRYSTAL + 0.01)
     for a0, a1 in WALL_GAPS:
         if a0 != 145:   # the panel chin passes under the skirt at 6 o'clock
@@ -541,12 +561,18 @@ def make_bezel():
     for x, y in LEDS["points"]:
         px, py = pt(x, y)
         bezel = bezel.fuse(cyl(PIPE_D / 2, PIPE_Z0, Z_FLANGE0 + 0.01, px, py))
-    # The button cap and the plate's sleeve round it pass through the flange at 6 o'clock.
+    # Charge-LED pipe: up through the skin to the face, thicker below the flange.
+    dx, dy = pt(*F["charge_led"]["center"])
+    bezel = bezel.fuse([cyl(LED_PIPE_D / 2, Z_FLANGE1 - 0.01, Z_FACE, dx, dy),
+                        cyl(LED_FOOT_D / 2, LED_FOOT_Z0, Z_FLANGE0 + 0.01, dx, dy)])
+    # Over the GPS module (up to 6.8 mm tall, edge at r 19.2 at its widest) nothing of the bezel beyond r 18.7
+    # comes below the flange (Z 7.0): no seat wall or skirt.
+    bezel = bezel.cut(sector(R_BEZEL_GPS, R_FLANGE1 + 1, GPS_CLEAR_ARC[0], GPS_CLEAR_ARC[1], Z_SKIRT0 - 1, Z_FLANGE0))
+    # The button bore down a sleeve under the lobe: the O-ring's bore, with a lead-in at its mouth.
     bx, by = pt(*BUTTON["center"])
-    bezel = bezel.cut(cyl(SLEEVE_R + 0.25, Z_FLANGE0 - 1, Z_FACE + 1, bx, by))
-    # Over the GPS module (up to 6.8 mm tall, edge at r 19.2 at its widest) only the top 0.8 mm of the lip remains
-    # beyond r 18.7: no seat wall, skirt or flange, so a tall module meets nothing below Z 7.2.
-    bezel = bezel.cut(sector(R_BEZEL_GPS, R_FLANGE1 + 1, GPS_CLEAR_ARC[0], GPS_CLEAR_ARC[1], Z_SKIRT0 - 1, Z_FLANGE1))
+    bezel = bezel.fuse(cyl(SLEEVE_R, SLEEVE_Z0, Z_FLANGE0 + 0.01, bx, by))
+    bezel = bezel.cut(cyl(CAP_BORE / 2, SLEEVE_Z0 - 1, Z_FACE + 1, bx, by))
+    bezel = bezel.cut(Part.makeCone(CAP_BORE / 2 + SLEEVE_LEAD, CAP_BORE / 2, SLEEVE_LEAD, V(bx, by, SLEEVE_Z0)))
     return largest_solid(bezel.removeSplitter())
 
 
@@ -622,6 +648,26 @@ def make_seal():
     seal = annulus(R_SKIRT_IN + SEAL_INSET, R_OUT - SEAL_INSET, Z_SPLIT, Z_SPLIT + PLATE_GAP)
     seal = seal.cut(door_pocket())
     return seal.cut(radial_box(F["usb"]["angle"], R_BOARD - 1.0, R_OUT + 2, USB_W, Z_SPLIT - 1, Z_SPLIT + 2))
+
+
+def make_crystal_gasket():
+    """The die-cut foam ring between the glass and the bezel lip, drawn squeezed."""
+    return annulus(*CRYSTAL_GASKET_R, Z_CRYSTAL_TOP, Z_LIP0)
+
+
+def make_lid_gasket():
+    """The die-cut foam sheet on the bezel flange, drawn squeezed to the plate's pocket ceiling: a ring round the
+    opening, a lobe round the button bore (open to the opening across the bore, so no thin bridge is left), and a
+    tab round the charge-LED pipe."""
+    z0, z1 = Z_FLANGE1, Z_POCKET
+    g = cyl(R_FLANGE1 - LID_INSET, z0, z1).fuse(flange_extras(-LID_INSET, z0, z1))
+    g = g.cut(cyl(R_OPENING + LID_INSET, z0 - 1, z1 + 1))
+    bx, by = pt(*BUTTON["center"])
+    g = g.cut(cyl(LOBE_HOLE, z0 - 1, z1 + 1, bx, by))
+    g = g.cut(radial_box(math.degrees(math.atan2(by - CY, bx - CX)), R_OPENING, math.hypot(bx - CX, by - CY),
+                         2 * LOBE_HOLE, z0 - 1, z1 + 1))
+    dx, dy = pt(*F["charge_led"]["center"])
+    return g.cut(cyl(LED_PIPE_BORE / 2 + 0.2, z0 - 1, z1 + 1, dx, dy)).removeSplitter()
 
 
 def make_oring():
@@ -780,6 +826,52 @@ def make_gps_envelope():
     return env.removeSplitter()
 
 
+def write_gasket_template(path):
+    """1:1 SVG cutting template for the die-cut gaskets, seen from the face: the lid gasket, the crystal ring and
+    the door frame (flat; it bends round the door when stuck on).  Print at 100 % and check the 50 mm bar."""
+    paths, x_off = [], 0.0
+
+    def outline(face, dx, dy):
+        d = []
+        for w in face.Wires:
+            pts = w.discretize(Deflection=0.01)
+            d.append("M " + " L ".join("%.3f %.3f" % (p.x - CX + dx, -(p.y - CY) + dy) for p in pts) + " Z")
+        return " ".join(d)
+
+    def top(shape):
+        z = shape.BoundBox.ZMax
+        return [f for f in shape.Faces if abs(f.BoundBox.ZMin - z) < 1e-6 and abs(f.BoundBox.ZMax - z) < 1e-6][0]
+
+    lid = make_lid_gasket()
+    bb = lid.BoundBox
+    x_lid, y_lid = 10 - (bb.XMin - CX), 24 + (bb.YMax - CY)
+    paths.append(("lid gasket", outline(top(lid), x_lid, y_lid), x_lid + 22, y_lid + 26))
+    r = CRYSTAL_GASKET_R[1]
+    x_cr, y_cr = x_lid + (bb.XMax - CX) + 10 + r, y_lid
+    paths.append(("crystal gasket", outline(top(make_crystal_gasket()), x_cr, y_cr), x_cr, y_cr + r + 6))
+    w, h = USB_W + 2 * DOOR_LAND_W, (USB_Z1 - USB_Z0) + 2 * DOOR_LAND_W
+    hw, hh = USB_W + 0.2, (USB_Z1 - USB_Z0) + 0.2
+    x0, y0 = x_cr + r + 10, y_cr - h / 2
+    d = "M %.3f %.3f h %.3f v %.3f h %.3f Z " % (x0, y0, w, h, -w)
+    d += "M %.3f %.3f h %.3f v %.3f h %.3f Z" % (x0 + (w - hw) / 2, y0 + (h - hh) / 2, hw, hh, -hw)
+    paths.append(("door gasket", d, x0 + w / 2, y0 + h + 6))
+    width, height = x0 + w + 10, y_lid + (bb.YMax - bb.YMin) / 2 + 16
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" width="%.1fmm" height="%.1fmm" viewBox="0 0 %.1f %.1f">' % (
+        width, height, width, height),
+        '<text x="10" y="7" font-family="sans-serif" font-size="3.5">Finder Puck gaskets, 1:1, seen from the face</text>',
+        '<text x="10" y="11.5" font-family="sans-serif" font-size="3">Lid and crystal: 0.3 mm closed-cell foam; '
+        'door: 0.5 mm</text>',
+        '<path d="M 10 16 h 50" stroke="black" stroke-width="0.3"/>'
+        '<text x="62" y="17" font-family="sans-serif" font-size="3">50 mm</text>']
+    for name, d, tx, ty in paths:
+        out.append('<path d="%s" fill="none" stroke="black" stroke-width="0.1" fill-rule="evenodd"/>' % d)
+        out.append('<text x="%.1f" y="%.1f" font-family="sans-serif" font-size="3" text-anchor="middle">%s</text>' % (
+            tx, ty, name))
+    out.append("</svg>")
+    with open(path, "w") as f:
+        f.write("\n".join(out) + "\n")
+
+
 # --- Checks -----------------------------------------------------------------
 
 def bb_gap(a, b):
@@ -821,7 +913,7 @@ def main():
         "Motor": make_motor(), "Antenna": make_antenna(),
         "Shell": make_shell(font), "Plate": make_plate(), "Ring": make_ring(), "Bezel": make_bezel(),
         "Cap": make_cap(), "Door": make_door(), "SwitchPlug": make_switch_plug(),
-        "Index": make_index(), "Seal": make_seal(), "ORing": make_oring(), "DoorGasket": make_door_gasket(),
+        "Index": make_index(), "Seal": make_seal(), "CrystalGasket": make_crystal_gasket(), "LidGasket": make_lid_gasket(), "ORing": make_oring(), "DoorGasket": make_door_gasket(),
         "ProxyPlug": make_ph_plug(), "ProxyCables": make_notch_cables(), "ProxyFold": make_fpc_fold(),
         "ProxyUSB": make_usb_overmold(), "ProxyGPS": make_gps_envelope(),
     }
@@ -838,7 +930,8 @@ def main():
 
     # Interference: printed parts against everything they must clear.
     printed = ("Shell", "Plate", "Ring", "Bezel", "Cap", "Door", "SwitchPlug")
-    hardware = tuple(n for n in shapes if n.startswith(("Bolt", "Insert", "Washer"))) + ("Index", "Seal", "ORing", "DoorGasket")
+    hardware = tuple(n for n in shapes if n.startswith(("Bolt", "Insert", "Washer"))) + ("Index", "Seal", "ORing", "DoorGasket",
+                                                                                    "CrystalGasket", "LidGasket")
     proxies = tuple(n for n in shapes if n.startswith("Proxy"))
     bad = 0
     close = {}
@@ -897,6 +990,7 @@ def main():
         print("mesh %-10s %6d facets, %s, %d self-intersection(s)%s" % (
             name, mesh.CountFacets, "closed" if mesh.isSolid() else "NOT closed", crossings, flag))
     Import.export([objs[n] for n in printed], os.path.join(CASE, NAME + "_case.step"))
+    write_gasket_template(os.path.join(CASE, NAME + "_gaskets.svg"))
     print("wrote", out)
 
 

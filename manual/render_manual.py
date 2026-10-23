@@ -53,6 +53,7 @@ REAL = {
     "Index": "orange", "Cord": "orange", "FoamRing": "foam", "Gasket": "foam", "Pad": "foam", "Sheet": "amber",
     "FPCflat": "brass", "FPCfold": "brass", "MotorLead": "red", "Pigtail": "black", "BattLead": "red",
     "Seal": "black", "ORing": "red", "Door": "black", "DoorGasket": "foam", "SwitchPlug": "black",
+    "CrystalGasket": "black", "LidGasket": "black",
 }
 for i in range(1, 5):
     REAL["Bolt%d" % i] = "orange"
@@ -145,7 +146,7 @@ def state(upto):
     order = [
         ("Shell",), ("Insert1", "Insert2", "Insert3", "Insert4"), ("Motor", "Antenna", "Pigtail"),
         ("Pad", "Battery", "Sheet", "BattLead"), ("Board", "MotorLead"), ("FoamRing", "Ring"), ("Panel", "FPCfold"),
-        ("Gasket", "Crystal"), ("Bezel",), ("Cap", "ORing"),
+        ("Gasket", "Crystal", "CrystalGasket"), ("Cap", "ORing"), ("Bezel", "LidGasket"),
         ("Seal", "Door", "DoorGasket", "Plate") + tuple("Washer%d" % i for i in range(1, 5)) + tuple("Bolt%d" % i for i in range(1, 5)),
         ("Index", "Cord", "SwitchPlug"),
     ]
@@ -197,12 +198,15 @@ def scenes():
         "card_sheet": {"Sheet": "amber"}, "card_cord": {"Cord": "orange"},
         "card_seal": {"Seal": "foam"}, "card_washer": {"Washer1": "white"}, "card_oring": {"ORing": "red"},
         "card_door": {"Door": "grey"}, "card_doorgasket": {"DoorGasket": "foam"}, "card_swplug": {"SwitchPlug": "grey"},
+        "card_crystalgasket": {"CrystalGasket": "foam"}, "card_lidgasket": {"LidGasket": "foam"},
     }
     for name, show in cards.items():
         S[name] = dict(show=show, view="iso", W=CARD, H=CARD)
     S["card_shell"]["view"] = "iso_top"
     S["card_plate"]["view"] = "iso_top"
     S["card_index"]["move"] = {}
+    S["card_crystalgasket"]["view"] = "iso_top"
+    S["card_lidgasket"]["view"] = "iso_top"
 
     # Step 1: inserts into the shell.
     dz = 22.0
@@ -294,29 +298,32 @@ def scenes():
     s["anchors"]["j2"] = j2
     S["s09"] = s
     S["s09_mag_j2"] = dict(show=dict(state(6), BattLead="teal"), at=j2, height=14.0)
-    # Step 10: gasket and crystal.
-    s = dict(show=state(6), move={"Gasket": lift(9.0), "Crystal": lift(18.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"].update(Gasket="teal", Crystal="teal")
+    # Step 10: gasket, crystal and the crystal's gasket.
+    s = dict(show=state(6), move={"Gasket": lift(9.0), "Crystal": lift(18.0), "CrystalGasket": lift(27.0)},
+             anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Gasket="teal", Crystal="teal", CrystalGasket="teal")
     s["anchors"]["gasket_from"] = at(160, 17.0, bc.Z_PANEL_TOP + 9.0 - 0.3)
     s["anchors"]["gasket_to"] = at(160, 17.0, bc.Z_PANEL_TOP + 0.4)
     s["anchors"]["crystal_from"] = at(20, 17.5, bc.Z_CRYSTAL + 18.0 - 0.3)
     s["anchors"]["crystal_to"] = at(20, 17.5, bc.Z_CRYSTAL + 0.4)
+    s["anchors"]["cgasket_from"] = at(200, 18.1, bc.Z_CRYSTAL_TOP + 27.0 - 0.3)
+    s["anchors"]["cgasket_to"] = at(200, 18.1, bc.Z_LIP0 + 18.0 + 0.4)
     S["s10"] = s
-    # Step 11: bezel.
-    s = dict(show=state(7), move={"Bezel": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"]["Bezel"] = "teal"
-    s["anchors"]["bezel_from"] = at(0, 20.5, bc.PIPE_Z0 + 20.0 - 0.3)
-    s["anchors"]["bezel_to"] = at(0, 20.5, bc.Z_FACE + 0.3)
-    s["anchors"]["pipe"] = V(LED_XY[3][0], LED_XY[3][1], 3.0)
-    S["s11"] = s
-    S["s11_mag"] = dict(show=state(8), at=V(LED_XY[3][0], LED_XY[3][1], 3.5), height=14.0)
-    # Step 12: cap.
-    s = dict(show=state(8), move={"Cap": lift(20.0), "ORing": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    # Step 11: cap, before the bezel (its flange is captive under the bezel's sleeve).
+    s = dict(show=state(7), move={"Cap": lift(20.0), "ORing": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
     s["show"].update(Cap="teal", ORing="red")
     s["anchors"]["cap_from"] = V(BTN[0], BTN[1], 4.0 + 20.0 - 0.5)
     s["anchors"]["cap_to"] = V(BTN[0], BTN[1], bc.BUTTON["stem_height"] + 0.3)
+    S["s11"] = s
+    S["s11_mag"] = dict(show=state(8), at=V(BTN[0], BTN[1], 6.0), height=16.0)
+    # Step 12: bezel, with the lid gasket stuck on its flange.
+    s = dict(show=state(8), move={"Bezel": lift(20.0), "LidGasket": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Bezel="teal", LidGasket="foam")
+    s["anchors"]["bezel_from"] = at(0, 20.5, bc.PIPE_Z0 + 20.0 - 0.3)
+    s["anchors"]["bezel_to"] = at(0, 20.5, bc.Z_FACE + 0.3)
+    s["anchors"]["pipe"] = V(LED_XY[3][0], LED_XY[3][1], 3.0)
     S["s12"] = s
-    S["s12_mag"] = dict(show=state(9), at=V(BTN[0], BTN[1], 6.0), height=16.0)
+    S["s12_mag"] = dict(show=state(9), at=V(LED_XY[3][0], LED_XY[3][1], 3.5), height=14.0)
     # Step 13: test before the plate goes on.
     s = dict(show=state(9), move={}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
     s["anchors"]["sw_from"] = at(F["power_switch"]["angle"], 48.0, 1.0)

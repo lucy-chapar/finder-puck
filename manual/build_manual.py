@@ -62,8 +62,6 @@ ICONS = {
     "pen": '<path d="M28 86 L36 62 L72 14 L84 22 L48 70 Z" fill="#f08a24" stroke="#333" stroke-width="3" stroke-linejoin="round"/><path d="M36 62 L48 70" stroke="#333" stroke-width="3"/>',
     "usb": '<rect x="34" y="12" width="32" height="26" rx="6" fill="#e8e8e8" stroke="#333" stroke-width="3"/><rect x="42" y="38" width="16" height="12" fill="#555"/>'
            '<path d="M50 50 L50 70 Q50 84 36 84 L14 84" %s/><rect x="40" y="18" width="20" height="8" rx="4" fill="#bbb"/>' % _S,
-    "uv": '<rect x="14" y="40" width="44" height="20" rx="4" fill="#555" stroke="#222" stroke-width="3"/><path d="M58 36 L66 36 L66 64 L58 64 Z" fill="#888" stroke="#222" stroke-width="3"/>'
-          '<path d="M70 42 L90 30 M70 50 L92 50 M70 58 L90 70" stroke="#7a3cff" stroke-width="5" stroke-linecap="round"/>',
 }
 
 

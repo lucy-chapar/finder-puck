@@ -7,9 +7,9 @@ LEDs on the face strobe a "beacon me" pattern for the last few metres, and there
 
 ![Case, closed](docs/case-closed.png)
 
-76.4 mm across, 17.7 mm thick. Matte black body, orange anodised socket-cap bolts on the face that pass through
+76.4 mm across, 18.3 mm thick. Matte black body, orange anodised socket-cap bolts on the face that pass through
 the PCB, a 10 mm orange button at 6 o'clock, a clear bezel around the crystal that the four beacon LEDs light from
-below, and an orange index dot at 12 o'clock over the GPS patch, which looks through a 0.8 mm skin. The back
+below, and an orange index dot at 12 o'clock over the GPS patch, which looks through a 0.9 mm skin. The back
 carries a debossed radar dial, the name and a 1 / 2 field. The case is designed to IP55 (dust protected, water
 jets from any direction) with the USB-C door slid shut and the switch plug pushed home; see [Sealing (IP55)](#sealing-ip55).
 [Build guide (PDF)](docs/finder_puck_build_guide.pdf).
@@ -30,6 +30,7 @@ jets from any direction) with the USB-C door slid shut and the switch plug pushe
 | `mech/finder_puck.step`, `mech/finder_puck_features.json` | Populated board in 3D, and everything the case needs from it |
 | `case/finder_puck_case.FCStd` | FreeCAD assembly: board, panel, crystal, battery, motor, antenna, bolts, inserts, shell, plate, ring, bezel, cap |
 | `case/finder_puck_{shell,plate,ring,bezel,cap}.stl` | Print files; `case/finder_puck_case.step` for other CAD |
+| `case/finder_puck_gaskets.svg` | 1:1 cutting template for the lid, crystal and door gaskets |
 | `case/finder_puck_{door,switchplug}.stl` | The sliding USB-C door and the TPU switch plug |
 | `docs/finder_puck_build_guide.pdf` | Step-by-step assembly guide (IKEA style) |
 | `manual/` | The guide's content, renderer and layout scripts |
@@ -96,25 +97,30 @@ Z = 0 is the top of the PCB.
   data sheet (UBX-22013293, table 19) gives 15.4–15.6 mm over the whole height, 5.8–6.8 mm tall, with
   de-paneling tabs of up to 0.3 mm at the PCB corners. u-blox's own STEP draws the patch 0.5 mm narrower than
   the drawing does, so the drawing is what the case is built to.
-- **Bezel** (clear resin): a 0.3 mm foam gasket sits on the glass, the Ø37.5 × 1.0 mm flat mineral crystal
-  rests on the ring's top, and the bezel sits over both: a skirt around the ring top locates it (0.25 mm radial),
-  its seat holds the crystal (0.25 mm radial), its lip (Ø34.8 window, flared to Ø43.4) overlaps the glass by 0.2 mm and
-  is the visible dial ring, and its flange under the plate skin is what the bolts clamp. Four Ø3 mm light pipes
-  hang from the flange to 0.3 mm above the WS2812s, so the whole lip glows when the beacon runs. Over the GPS
-  module (12 o'clock, 64–116°) the ring wall is thinned and the bezel is nothing but its 0.8 mm lip beyond r 18.7
-  (0.5 mm from the widest module). The ring used to be one part; a panel cannot be fitted past a ledge below it and a lip above it, hence the split. `LIP_PROUD`
+- **Bezel** (clear resin): a 0.3 mm foam gasket sits on the panel's glass, the Ø37.5 × 1.0 mm flat mineral
+  crystal rests on the ring's top, and the bezel sits over both: a skirt around the ring top locates it (0.25 mm
+  radial), its seat holds the crystal (0.25 mm radial), its lip (Ø34.8 window, flared to Ø43.4) overlaps the
+  glass by 0.2 mm and is the visible dial ring, pressing a 0.3 mm die-cut foam ring (Ø35.2–37.2) onto the
+  crystal's edge, and its 0.5 mm flange under the plate skin, which runs all the way round, is what the bolts
+  clamp, through a die-cut lid gasket. The flange has a lobe at 6 o'clock that carries the button bore's sleeve
+  (down to Z 5.2, with a 0.4 mm lead-in, for the cap's O-ring) and a tab out to the charge LED with a Ø1.2 mm
+  light pipe up through the skin to the face (Ø1.6 below the flange, 0.3 mm above the LED). Four Ø3 mm light
+  pipes hang from the flange to 0.3 mm above the WS2812s, so the whole lip glows when the beacon runs. Over the
+  GPS module (12 o'clock, 64–116°) the ring wall is thinned and nothing of the bezel beyond r 18.7 comes below
+  the flange (Z 7.0, 0.2 mm over the tallest module). The ring used to be one part; a panel cannot be fitted past a ledge below it and a lip above it, hence the split. `LIP_PROUD`
   raises the lip's top above the face (default 0, see "Seeing the beacon from the side").
-- **Plate** (black): skin 1.6 mm, face at Z 8.0, Ø8 bosses down to the board (they, not the rim, are the datum:
+- **Plate** (black): skin 1.6 mm, face at Z 8.6, Ø8 bosses down to the board (they, not the rim, are the datum:
   the 1.5 mm skirt stops 0.6 mm above the shell's rim, the gap the 1.0 mm foam seal is squeezed into), Ø5.2
   counterbores so the orange M2.5 × 12 socket-cap heads sit 0.2 mm proud on a 0.5 mm nylon washer (Ø3.0 bores,
-  Ø2.8 holes in the board), the Ø44 bezel opening (0.3 mm reveal), the skin thinned to 0.8 mm over the
-  GPS module out to the wall (`GPS_WINDOW = "open"` in `build_case.py` cuts it open instead), a Ø1.8 hole through
-  that cover at 12 o'clock for a glued orange 1.75 mm filament stub, the Ø10.6 button bore (continued down a
-  0.6 mm sleeve under the skin to Z 5.2, with a 0.4 mm lead-in, for the cap's O-ring), a 1.2 mm pinhole over
-  the charge LED, a 1.2 mm dimple beside the switch slot marking its ON end (towards 9 o'clock, away from the
+  Ø2.8 holes in the board), the Ø44 bezel opening (0.3 mm reveal) with a pocket 0.7 mm deep under
+  the skin for the bezel's flange and the lid gasket, the skin thinned to 0.9 mm over the GPS module out to the
+  wall (`GPS_WINDOW = "open"` in `build_case.py` cuts it open instead), a blind Ø1.8 × 0.6 mm hole in that cover
+  at 12 o'clock for a glued orange 1.75 mm filament stub, the Ø10.6 button bore (the bezel's sleeve continues
+  it), a Ø1.4 bore for the charge-LED pipe, a 1.2 mm dimple beside the switch slot marking its ON end (towards 9 o'clock, away from the
   button: the PCM12 closes terminals 1–2 with the knob at the terminal-1 end, and terminal 1 is the grounded
   one), and the 13.5 × 7.5 mm USB-C opening shared with the shell at the parting line.
-- **Cap** (orange): Ø10, 1.5 mm proud, 1.0 mm edge radius, a Ø12.4 flange captive 0.1 mm under the sleeve, a
+- **Cap** (orange): Ø10, 1.5 mm proud, 1.0 mm edge radius, a Ø12.4 flange captive 0.1 mm under the bezel's
+  sleeve (so the cap goes on before the bezel), a
   groove for a 9 × 1 mm silicone O-ring that seals against the sleeve's bore (0.8 mm gland, 20 % squeeze;
   the groove's upper wall is 45° so it prints pocket down), and a square pocket that sits on the PTS645 stem
   (a dot of glue keeps it there).
@@ -132,7 +138,7 @@ Z = 0 is the top of the PCB.
 
 `build_case.py` places every opening from the board's feature file and checks the seven printed parts against the
 populated board, panel, crystal, battery, motor, antenna, bolts, washers, inserts, the seam seal, the O-ring, the
-door gasket and each other, and against proxies
+door, crystal and lid gaskets and each other, and against proxies
 for what the board model lacks: the mated battery plug (a 6.85 × 5.8 × 4.5 mm PHR-2 housing standing 2 mm out
 of J2's mouth, 2.5 mm from the wall), the two battery wires and the pigtail standing side by side in the
 notch, the FPC's 0.45 mm fold bump under the panel chin, a USB-C plug's 12.35 × 6.5 mm overmold and the GPS
@@ -146,13 +152,14 @@ nothing else:
 
 | Gap | Pairs |
 |---|---|
-| contact | board on the shell ledge, motor in its pocket, antenna on the wall, plate bosses on the board, washers under the bolt heads in the counterbores, the seal between the shell rim and the plate skirt, the O-ring in the cap's groove and the sleeve, the door's gasket between the door and the land, bezel flange under the skin, panel and crystal on the ring, bezel on the ring top, lip on the crystal |
+| contact | board on the shell ledge, motor in its pocket, antenna on the wall, plate bosses on the board, washers under the bolt heads in the counterbores, the seal between the shell rim and the plate skirt, the O-ring in the cap's groove and the bezel's sleeve, the door's gasket between the door and the land, the lid gasket between the bezel flange and the plate, the crystal gasket between the crystal and the lip, panel and crystal on the ring, bezel on the ring top, index stub on the bottom of its hole |
 | 0.025 mm | index stub in its hole (glued) |
 | 0.05 mm | the door in its pocket and its tongues in the grooves, the door over the seal's end |
-| 0.1 mm | cap flange under the sleeve, cap pocket over the button body |
+| 0.1 mm | cap flange under the sleeve, cap pocket over the button body, charge-LED pipe in its bore |
 | 0.14 mm | switch plug over the switch knob |
-| 0.2 mm | shell lap lip under the plate, bezel over the panel (the compressed gasket), USB-C plug overmold under the plate |
+| 0.2 mm | shell lap lip under the plate, bezel over the panel (the compressed gasket), bezel over the crystal (its gasket), bezel flange over the GPS module at its tallest, USB-C plug overmold under the plate |
 | 0.25 mm | bolt shanks in the plate bores, ring foot over the board (the compressed foam ring) |
+| 0.3 mm | cap in the plate's bore |
 
 Print the shell upright, the ring upside down (top face on the bed; slow the perimeters under its
 0.85 mm ledge, and let the slicer print the single-perimeter 0.45 mm wall over the GPS arc as a thin wall), the
@@ -169,8 +176,8 @@ from above ([side view](docs/case-side.png)). Three ways to show it from the sid
 - **Lip standing proud** (`LIP_PROUD` in `build_case.py`, default 0): the lip's top rises 1.5–2 mm above the
   plate, a glowing clear ring visible from every direction, level with the orange cap (also 1.5 mm proud). No
   new part, no change to the board, the plate or the bolt sandwich, and the puck is no taller than it already
-  is at the cap. Costs: the glass then sits 2.8 mm instead of 1.3 mm below the lip's top, so the lip's inner
-  edge hides the outer 1.2 mm of the active area beyond about 23° off-axis (43° today) unless that edge gets
+  is at the cap. Costs: the glass then sits 3.4 mm instead of 1.9 mm below the lip's top, so the lip's inner
+  edge hides the outer 1.2 mm of the active area beyond about 19° off-axis (32° today) unless that edge gets
   a 45° chamfer, which would also catch more light; and the resin lip shares the first hit in a face-down
   drop with the cap. 1.5 mm is enough; 2 mm looks like a crown.
 - **Smoke-PETG plate:** a 1.6 mm dark translucent skin would show four faint spots over the LEDs and a halo
@@ -193,17 +200,21 @@ IP55 is dust protected (no harmful deposit) and water jets from any direction (I
 | Shell-to-plate seam | 1.0 mm closed-cell foam (EPDM, neoprene or PORON), 1.4 mm wide, on the shell's rim under the plate's 1.5 mm skirt, squeezed to 0.6 mm (40 %) by the bolted stack. The plate's bosses stay the datum, so the squeeze does not depend on how hard the bolts are done up. At the door it runs out to the pocket floor and the land, and it is open only across the USB-C opening itself, inside the door's gasket |
 | USB-C opening | Sliding door: a die-cut 0.5 mm closed-cell foam frame on its inside, squeezed 40 % on a raised land round the opening when shut (and clear of the pocket while sliding) |
 | Switch slot | TPU plug in the scallop; the slot no longer reaches the seam |
-| Button | 9 × 1 mm silicone O-ring on the cap, in the plate's sleeve (grease it) |
+| Button | 9 × 1 mm silicone O-ring on the cap, in the bezel's sleeve (grease it) |
 | Bolt bores | DIN 433 M2.5 nylon washer under each head; the insert holes in the shell are blind |
-| Crystal | UV resin round its top edge into the bezel's 0.25 mm seat, cured through the clear lip |
-| Bezel to plate | UV resin round the lip where it meets the plate (the flange is cut away over the GPS module, so the flange alone would not seal) |
-| Charge-LED pinhole | filled flush with clear UV resin |
-| Index stub | glued all round in its hole through the GPS cover |
-| GPS window | the 0.8 mm skin (`GPS_WINDOW = "open"` cuts a hole and is not sealed; the build prints a CHECK) |
+| Crystal | die-cut 0.3 mm closed-cell foam ring on its edge, squeezed to 0.2 mm under the bezel's lip |
+| Bezel to plate | die-cut 0.3 mm closed-cell foam lid gasket on the bezel's flange, squeezed to 0.2 mm under the plate's pocket ceiling. It rings the opening and runs round the button bore (1.5 mm web) and the charge-LED pipe (1.1 mm web), so water down either bore stops at it |
+| Charge LED | a light pipe on the bezel, up through the skin: sealed by the lid gasket round it, not by a hole in the plate |
+| Index stub | glued into a blind hole, 0.3 mm of skin under it |
+| GPS window | the 0.9 mm skin (`GPS_WINDOW = "open"` cuts a hole and is not sealed; the build prints a CHECK) |
 | Lanyard tunnel | a bore through solid wall, not into the case |
 
-The lid (plate, bezel, crystal, cap) still comes off as one piece with the four bolts, so the panel stays
-reachable. Nothing has been tested yet: the rating is what the design aims at. To check a built puck, put a
+Nothing is glued or potted: the lid (plate, bezel, crystal, cap) comes off as one piece with the four bolts, so
+the panel stays reachable, and the gaskets are cut again from the 1:1 template `case/finder_puck_gaskets.svg`
+(lid and crystal gaskets, and the door's frame flat) when they take a set. The crystal gasket, the lid gasket and
+the 0.5 mm foam ring under the ring are squeezed in series by the bolted stack (the plate's bosses fix the total),
+so the two gaskets want a soft, low-set foam (PORON or a soft PE/EPDM) at least as soft as the foam ring; a
+black crystal gasket shows as a thin dark line through the clear lip, a white or clear one does not. Nothing has been tested yet: the rating is what the design aims at. To check a built puck, put a
 dry tissue inside, close it, and spray it from 2.5–3 m with a hose and a 6.3 mm nozzle (a 12.5 l/min flow)
 for 3 minutes, turning it to reach every face, then open it; for dust, shake it in a bag of talc. The design
 has no pressure vent: a sealed puck that goes from a hot car into cold water pulls a little vacuum, so if
@@ -316,19 +327,19 @@ ordered. The rest can be ordered with the boards; the AliExpress lines take long
 | O-ring 9 × 1 mm (ID × section), silicone (button) | Any metric O-ring kit or seller; not yet sourced | 4 | | | 1.0 mm section; it sits in the cap's groove without stretching |
 | Nylon washer DIN 433 M2.5 (2.7 × 5 × 0.5 mm) | Any; not yet sourced | 10 | | | At most 5.0 mm across (the counterbore is Ø5.2) and 0.5 mm thick |
 | TPU filament 85A–95A, black (the switch plug) | Any; under 1 g a puck | 1 spool or offcut | | | |
-| Clear UV resin and a UV torch (crystal, bezel, pinhole) | Any jewellery or repair UV resin | 1 | | | It cures through the clear bezel in under a minute |
+| Closed-cell foam sheet, 0.3 mm, soft and low-set, one adhesive side, at least 75 × 60 mm (crystal and lid gaskets, cut along `case/finder_puck_gaskets.svg`) | PORON or a soft PE/EPDM foam; not yet sourced, buy to the spec (the 10 mm wide PE tape for the panel gasket is too narrow for the lid gasket) | 1 sheet | | | 0.25–0.35 mm under light pressure, softer than the 0.5 mm foam ring |
 | Silicone grease (O-ring) | Any | 1 | | | |
 | Bezel in clear SLA resin | [JLC3DP](https://jlc3dp.com/3d-printing-quote): upload `case/finder_puck_bezel.stl` (1.5 cm³, 52 × 49 × 7 mm) in [8001 resin](https://jlc3dp.com/help/article/photosensitive-8001-resin), Transparent (sanded and oiled by default). Order it with the boards to share the shipping; any SLA bureau with a clear resin will do | 3 | $3–6 (get a quote) | About 3 days to print, then shipping | Dry-fit it over a printed ring with the crystal: the skirt locates and the crystal drops into its seat (JLC3DP quotes ±0.2 mm, the fits are 0.25 mm) |
 
 Rough total: about $215 of parts for two pucks with these spares, or $255 with both filament spools, plus
 roughly $40–60 of shipping across the separate orders. The three radio modules are a third of it. The Mouser lines
 (radio, motors, SH parts) make one order and the AliExpress lines another. The tools are listed in the build
-guide; the pre-crimped SH leads mean no crimper is needed. The sealing parts (foam, O-rings, nylon washers, TPU, UV resin)
+guide; the pre-crimped SH leads mean no crimper is needed. The sealing parts (foam, O-rings, nylon washers, TPU)
 are not priced yet and are not in that total.
 
 ## Build guide
 
-`docs/finder_puck_build_guide.pdf` is the assembly manual: cover, parts, tools, fourteen picture steps and a back
+`docs/finder_puck_build_guide.pdf` is the assembly manual: cover, parts, tools, sixteen picture steps and a back
 page, in the style of the R+D build guides. It is generated:
 
 - `manual/manual_steps.py` holds the content: parts with quantities, tools, and each step's scene, arrows,
