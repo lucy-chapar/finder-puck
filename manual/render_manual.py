@@ -48,7 +48,7 @@ STYLES = {
     "amber": ((0.85, 0.62, 0.25), 20), "red": ((0.80, 0.15, 0.12), 0),
 }
 REAL = {
-    "Shell": "black", "Plate": "black", "Ring": "black", "Bezel": "trans", "Cap": "orange",
+    "Shell": "black", "Window": "black", "WindowGasket": "black", "Plate": "black", "Ring": "black", "Bezel": "trans", "Cap": "orange",
     "Board": "dark", "Panel": "panel", "Crystal": "glass", "Battery": "foam", "Motor": "grey", "Antenna": "brass",
     "Index": "orange", "Cord": "orange", "FoamRing": "foam", "Gasket": "foam", "Pad": "foam", "Sheet": "amber",
     "FPCflat": "brass", "FPCfold": "brass", "MotorLead": "red", "Pigtail": "black", "BattLead": "red",
@@ -57,7 +57,6 @@ REAL = {
 }
 for i in range(1, 5):
     REAL["Bolt%d" % i] = "orange"
-    REAL["Insert%d" % i] = "brass"
     REAL["Washer%d" % i] = "white"
 EDGE = (0.13, 0.13, 0.14)
 
@@ -124,12 +123,10 @@ def make_helpers(doc):
                     V(notch.x + 0.8, notch.y, -6.5), V(notch.x + 0.8, notch.y, 2.0), V(j4[0] + 0.3, j4[1] - 1.2, 2.6)], 0.55)
     batt_lead = wire([V(CX + 6.0, CY - 25.5, -4.5), V(notch.x - 4.0, notch.y + 1.5, -4.5), V(notch.x, notch.y, -4.5),
                       V(notch.x, notch.y, 2.0), V(j2[0] + 1.5, j2[1] - 5.6, 3.0)], 0.6)
-    # Cord: through the chord bore and a half loop outside at 6 o'clock.
-    half = math.sqrt(bc.R_OUT ** 2 - bc.LANYARD_R ** 2)
-    yb = CY - bc.LANYARD_R
-    loop = Part.makeTorus(half, 1.25, V(CX, yb, bc.LANYARD_Z), V(0, 0, 1), -180, 180, 180)
-    loop.rotate(V(CX, yb, bc.LANYARD_Z), V(0, 0, 1), 180)
-    cord = loop.fuse(Part.makeCylinder(1.25, 2 * half, V(CX - half, yb, bc.LANYARD_Z), V(1, 0, 0)))
+    # Cord: in at the side hole at 6 o'clock, round the bend, out of the back, and a loop outside.
+    la, lr, lz = bc.LANYARD_ANGLE, bc.LANYARD_R, bc.LANYARD_Z
+    cord = wire([at(la, lr, bc.Z_BOTTOM - 7.0), at(la, lr, lz), at(la, bc.R_OUT + 7.0, lz),
+                 at(la, bc.R_OUT + 7.0, bc.Z_BOTTOM - 7.0), at(la, lr, bc.Z_BOTTOM - 7.0)], 1.2)
     for name, shape in (("FoamRing", foam), ("Gasket", gasket), ("Pad", pad), ("Sheet", sheet), ("FPCflat", flat),
                         ("FPCfold", fold), ("Cord", cord), ("MotorLead", motor_lead), ("Pigtail", pigtail),
                         ("BattLead", batt_lead)):
@@ -144,7 +141,7 @@ def make_helpers(doc):
 
 def state(upto):
     order = [
-        ("Shell",), ("Insert1", "Insert2", "Insert3", "Insert4"), ("Motor", "Antenna", "Pigtail"),
+        ("Shell",), ("WindowGasket", "Window"), ("Motor", "Antenna", "Pigtail"),
         ("Pad", "Battery", "Sheet", "BattLead"), ("Board", "MotorLead"), ("FoamRing", "Ring"), ("Panel", "FPCfold"),
         ("Gasket", "Crystal", "CrystalGasket"), ("Cap", "ORing"), ("Bezel", "LidGasket"),
         ("Seal", "Door", "DoorGasket", "Plate") + tuple("Washer%d" % i for i in range(1, 5)) + tuple("Bolt%d" % i for i in range(1, 5)),
@@ -178,7 +175,7 @@ MOTOR = bc.pt(*bc.MOTOR_POCKET)
 ANT = bc.at((bc.FLEX_ARC[0] + bc.FLEX_ARC[1]) / 2, bc.R_IN - 0.5)
 F = bc.F
 CHIN = CY - bc.PANEL["chin_reach"] + bc.BY
-HALF = math.sqrt(bc.R_OUT ** 2 - bc.LANYARD_R ** 2)
+WIN_MID = (bc.WINDOW[0] + bc.WINDOW[1]) / 2
 
 
 def scenes():
@@ -193,7 +190,7 @@ def scenes():
         "card_bezel": {"Bezel": "trans"}, "card_cap": {"Cap": "orange"}, "card_board": {"Board": "dark"},
         "card_panel": {"Panel": "panel", "FPCflat": "brass"}, "card_crystal": {"Crystal": "glass"},
         "card_battery": {"Battery": "foam"}, "card_motor": {"Motor": "grey"}, "card_antenna": {"Antenna": "brass"},
-        "card_bolt": {"Bolt1": "orange"}, "card_insert": {"Insert1": "brass"}, "card_index": {"Index": "orange"},
+        "card_bolt": {"Bolt1": "orange"}, "card_window": {"Window": "grey"}, "card_windowgasket": {"WindowGasket": "foam"}, "card_index": {"Index": "orange"},
         "card_foamring": {"FoamRing": "foam"}, "card_gasket": {"Gasket": "foam"}, "card_pad": {"Pad": "foam"},
         "card_sheet": {"Sheet": "amber"}, "card_cord": {"Cord": "orange"},
         "card_seal": {"Seal": "foam"}, "card_washer": {"Washer1": "white"}, "card_oring": {"ORing": "red"},
@@ -208,16 +205,18 @@ def scenes():
     S["card_crystalgasket"]["view"] = "iso_top"
     S["card_lidgasket"]["view"] = "iso_top"
 
-    # Step 1: inserts into the shell.
-    dz = 22.0
-    s = dict(show=state(0), move={}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    for i, (px, py) in enumerate(BOLT_XY, 1):
-        s["show"]["Insert%d" % i] = "teal"
-        s["move"]["Insert%d" % i] = lift(dz)
-        s["anchors"]["ins%d_from" % i] = V(px, py, -T - bc.INSERT_L + dz - 0.5)
-        s["anchors"]["ins%d_to" % i] = V(px, py, -T + 0.3)
+    # Step 1: the window gasket and the window into the shell's notch.
+    dzg, dzw = 10.0, 24.0
+    s = dict(show=state(0), move={"WindowGasket": lift(dzg), "Window": lift(dzw)}, anchors={}, view="iso",
+             W=STEP_W, H=STEP_H)
+    s["show"].update(WindowGasket="teal", Window="teal")
+    s["anchors"]["wg_from"] = at(WIN_MID, bc.R_OUT - 0.8, bc.Z_FLOOR + dzg + 1.0)
+    s["anchors"]["wg_to"] = at(WIN_MID, bc.R_OUT - 0.8, bc.Z_FLOOR + 0.3)
+    s["anchors"]["win_from"] = at(WIN_MID - 25, bc.R_OUT + 0.3, bc.Z_FLOOR + dzw)
+    s["anchors"]["win_to"] = at(WIN_MID - 25, bc.R_OUT + 0.3, bc.Z_FLOOR + 1.5)
+    s["anchors"]["flank"] = at(bc.WINDOW[0] - 4.0, bc.R_OUT, bc.Z_FLOOR + 3.0)
     S["s01"] = s
-    S["s01_mag"] = dict(show=state(1), at=V(BOLT_XY[2][0], BOLT_XY[2][1], -T), height=13.0)
+    S["s01_mag"] = dict(show=state(1), at=at(bc.WINDOW[0] - 4.0, bc.R_OUT, bc.Z_FLOOR + 3.0), height=13.0)
     # Step 2: motor and antenna (the pigtail is drawn once the antenna is in).
     dz = 16.0
     s = dict(show=state(1), move={"Motor": lift(dz), "Antenna": lift(dz)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
@@ -365,8 +364,8 @@ def scenes():
     s["anchors"]["swplug_to"] = at(F["power_switch"]["angle"], bc.R_OUT + 0.2, 0.6)
     s["anchors"]["index_from"] = V(CX, CY + bc.INDEX_R, bc.Z_FACE - bc.INDEX_DEPTH + 12.0 - 0.4)
     s["anchors"]["index_to"] = V(CX, CY + bc.INDEX_R, bc.Z_FACE + 0.3)
-    s["anchors"]["cord_from"] = V(CX - HALF, CY - bc.LANYARD_R - 16.0 + 1.5, bc.LANYARD_Z)
-    s["anchors"]["cord_to"] = V(CX - HALF - 0.5, CY - bc.LANYARD_R - 0.5, bc.LANYARD_Z)
+    s["anchors"]["cord_from"] = at(bc.LANYARD_ANGLE, bc.R_OUT + 16.0 + 7.0 + 1.5, bc.LANYARD_Z)
+    s["anchors"]["cord_to"] = at(bc.LANYARD_ANGLE, bc.R_OUT + 0.5, bc.LANYARD_Z)
     S["s15"] = s
     S["s15_mag"] = dict(show=state(11), at=V(CX, CY + bc.INDEX_R, bc.Z_FACE), height=11.0)
     # Step 16: switch on, charge, mark.

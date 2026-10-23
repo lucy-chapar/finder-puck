@@ -9,7 +9,7 @@ into each picture so the layout can draw arrows and magnifier call-outs on top o
 TITLE = "Finder Puck"
 SUBTITLE = "Build Guide"
 VARIANT = "Round-screen puck, through-bolted"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 BRAND = {
     "name": "RESEARCH + DESIRE",
     "logo": "assets/rad-logo.png",
@@ -23,7 +23,8 @@ BRAND = {
 # Parts: key -> (group, display name, quantity, detail line, picture).
 # Pictures are render_manual card scenes.
 PARTS = {
-    "shell":   ("printed", "Shell", 1, "black", "card_shell"),
+    "shell":   ("machined", "Shell", 1, "6061 aluminium, black anodised", "card_shell"),
+    "window":  ("printed", "Antenna window", 1, "black", "card_window"),
     "plate":   ("printed", "Plate", 1, "black", "card_plate"),
     "ring":    ("printed", "Ring", 1, "black", "card_ring"),
     "bezel":   ("printed", "Bezel", 1, "clear resin", "card_bezel"),
@@ -37,21 +38,21 @@ PARTS = {
     "motor":   ("electronics", "Vibration motor", 1, "Ø10 mm coin, JST SH lead", "card_motor"),
     "antenna": ("electronics", "915 MHz antenna", 1, "adhesive flex 40 × 7 mm (2J 2JF0515P), U.FL", "card_antenna"),
     "bolt":    ("hardware", "Bolt M2.5 × 12", 4, "socket cap, aluminium (non-magnetic)", "card_bolt"),
-    "insert":  ("hardware", "Heat-set insert M2.5", 4, "Ruthex RX-M2.5x5.7, 4 mm hole", "card_insert"),
     "index":   ("hardware", "Index stub", 1, "orange 1.75 mm filament, trim flush", "card_index"),
     "foamring": ("hardware", "Foam ring", 1, "0.5 mm, Ø36.3–38 mm, open 10 to 5 o'clock", "card_foamring"),
     "gasket":  ("hardware", "Gasket", 1, "0.3 mm foam, Ø32.5–35 mm", "card_gasket"),
     "pad":     ("hardware", "Battery pad", 1, "0.5 mm foam, 34 × 50 mm", "card_pad"),
     "sheet":   ("hardware", "Insulation sheet", 1, "0.2 mm Kapton or PET, 36 × 52 mm", "card_sheet"),
     "cord":    ("hardware", "Cord", 1, "Ø2.5 mm, 300 mm", "card_cord"),
-    "seal":    ("hardware", "Seam seal", 1, "1.0 mm closed-cell foam, Ø73.5–76.3 mm, open at 3 o'clock", "card_seal"),
+    "seal":    ("hardware", "Seam seal", 1, "1.0 mm closed-cell foam, Ø72.9–76.3 mm, open at 3 o'clock", "card_seal"),
+    "windowgasket": ("hardware", "Window gasket", 1, "1.0 mm closed-cell foam strip, 1.7 × 103 mm", "card_windowgasket"),
     "washer":  ("hardware", "Washer M2.5", 4, "nylon DIN 433, 5 × 2.7 × 0.5 mm", "card_washer"),
     "oring":   ("hardware", "O-ring", 1, "9 × 1 mm silicone", "card_oring"),
     "doorgasket": ("hardware", "Door gasket", 1, "0.5 mm closed-cell foam frame, 15.9 × 9.4 mm, 13.7 × 7.2 mm hole", "card_doorgasket"),
     "crystalgasket": ("hardware", "Crystal gasket", 1, "0.3 mm closed-cell foam ring, Ø35.2–37.2 mm", "card_crystalgasket"),
     "lidgasket": ("hardware", "Lid gasket", 1, "0.3 mm closed-cell foam, cut from the template", "card_lidgasket"),
 }
-PART_GROUPS = (("printed", "3D printed"), ("electronics", "Electronics"), ("hardware", "Hardware"))
+PART_GROUPS = (("machined", "Machined"), ("printed", "3D printed"), ("electronics", "Electronics"), ("hardware", "Hardware"))
 
 # Tools: (group, name, icon).  Icons are drawn by build_manual.ICONS.
 TOOLS = (
@@ -72,11 +73,13 @@ TOOL_GROUPS = (("required", "Required"), ("recommended", "Recommended"))
 
 # Shown between Tools and step 1.
 BEFORE = (
-    ("Print", "Shell upright, ring upside down (top face on the bed), plate face down, cap pocket down; 0.2 mm "
-              "layers, four walls. Print the bezel in clear resin: its flange cannot be bridged and its fits are "
-              "0.25 mm. Print the door standing on its edge and the switch plug in TPU, standing on its strap end. Print a hole coupon before "
-              "trusting the insert holes."),
+    ("Make", "The shell is CNC machined from 6061 and black anodised (the logo is V-carved after anodising, or "
+             "masked, so it shows bare metal). Print the antenna window upside down (rim on the bed), the ring upside down "
+             "(top face on the bed), the plate face down, the cap pocket down; 0.2 mm layers, four walls. Print the "
+             "bezel in clear resin: its flange cannot be bridged and its fits are 0.25 mm. Print the door standing on "
+             "its edge and the switch plug in TPU, standing on its strap end."),
     ("Sealing", "The puck is built to IP55 (dust, water jets). That holds only with every seal in: the seam seal, "
+                "the window gasket, "
                 "a washer under each bolt head, the O-ring on the cap, the crystal and lid gaskets, the door slid shut "
                 "and the switch plug pushed fully home. Cut the seam seal with a compass cutter; print "
                 "case/finder_puck_gaskets.svg at 100 % and cut the lid, crystal and door gaskets along it."),
@@ -86,7 +89,7 @@ BEFORE = (
     ("Battery", "The cell is live whatever the switch does. It is plugged in only after the soldering (step 9), "
                 "and the insulation sheet goes on it before the board. Check the lead's polarity with the meter; "
                 "many cells are wired the other way round."),
-    ("Iron", "220 °C for the inserts, 320 °C with plenty of flux for the 0.7 mm flex. Clean with alcohol."),
+    ("Iron", "320 °C with plenty of flux for the 0.7 mm flex. Clean with alcohol."),
     ("Compass", "Keep steel away from the compass: aluminium bolts only, no steel screws or magnets near the puck."),
 )
 
@@ -94,14 +97,14 @@ BEFORE = (
 # mags: magnifier call-outs: (zoom scene, anchor it points at, corner, label).
 # note: one short line under the picture when the picture cannot say it alone.
 STEPS = (
-    dict(scene="s01", parts=[("shell", 1), ("insert", 4)],
-         arrows=[("ins%d_from" % i, "ins%d_to" % i, "straight") for i in (1, 2, 3, 4)],
-         mags=[("s01_mag", "ins3_to", "tl", "4×")],
-         note="Heat-set with the iron at 220 °C until the insert is flush with the boss.", tool="iron"),
+    dict(scene="s01", parts=[("shell", 1), ("windowgasket", 1), ("window", 1)],
+         arrows=[("wg_from", "wg_to", "straight"), ("win_from", "win_to", "straight")],
+         mags=[("s01_mag", "flank", "tl", "")],
+         note="Stick the foam strip along the floor of the notch and up both sloped ends, from rim to rim. Drop the window in: its two pegs go into the holes in the floor."),
     dict(scene="s02", parts=[("motor", 1), ("antenna", 1)],
          arrows=[("motor_from", "motor_to", "straight"), ("ant_from", "ant_to", "straight")],
          mags=[("s02_mag", "motor_to", "tl", "")],
-         note="Motor in the pocket at 2 o'clock, lead up. Peel the flex antenna and press it to the inside of the wall between 12 and 3 o'clock, cable end at 3 o'clock; run the pigtail along the floor to the notch at 5 o'clock."),
+         note="Motor in the pocket at 2 o'clock, lead up. Peel the flex antenna and press it to the inside of the plastic window, cable end at 3 o'clock, its lower edge level with the window's feet; run the pigtail along the floor to the notch at 5 o'clock."),
     dict(scene="s03", parts=[("pad", 1), ("battery", 1), ("sheet", 1)],
          arrows=[("pad_from", "pad_to", "straight"), ("batt_from", "batt_to", "straight"), ("sheet_from", "sheet_to", "straight")],
          mags=[],
@@ -150,12 +153,12 @@ STEPS = (
     dict(scene="s14", parts=[("seal", 1), ("door", 1), ("doorgasket", 1), ("plate", 1), ("washer", 4), ("bolt", 4)],
          arrows=[("seal_from", "seal_to", "straight"), ("door_from", "door_to", "straight"), ("plate_from", "plate_to", "straight")] + [("bolt%d_from" % i, "bolt%d_to" % i, "straight") for i in (1, 2, 3, 4)],
          mags=[("s14_mag", "bolt2_to", "tl", "")],
-         note="Stick the seal on the shell rim, ends against the USB-C opening. Stick the gasket frame inside the door and hook the door into the lower groove, slid shut. Lower the plate, then the bolts on their washers: hand-tight, in a cross (aluminium sockets strip).", tool="hexkey"),
+         note="Stick the seal on the rim of the shell and window, ends against the USB-C opening. Stick the gasket frame inside the door and hook the door into the window's groove, slid shut. Lower the plate, then the bolts on their washers: hand-tight, in a cross (aluminium sockets strip).", tool="hexkey"),
     dict(scene="s15", parts=[("index", 1), ("cord", 1), ("swplug", 1)],
          arrows=[("index_from", "index_to", "straight"), ("cord_from", "cord_to", "straight"),
                  ("swplug_from", "swplug_to", "straight")],
          mags=[("s15_mag", "index_to", "br", "")],
-         note="Glue the orange stub into the blind hole at 12 o'clock and trim it flush. Glue the switch plug's pin into the hole under the slot and push the plug home. Thread the cord in one mouth and out the other, then knot it.", tool="glue"),
+         note="Glue the orange stub into the blind hole at 12 o'clock and trim it flush. Glue the switch plug's pin into the hole under the slot and push the plug home. Thread the cord in at the side hole at 6 o'clock and out of the hole in the back (a loop of thin wire pulls it round the bend), then knot it.", tool="glue"),
     dict(scene="s16", parts=[],
          arrows=[("sw_from", "sw_to", "straight"), ("usb_from", "usb_to", "straight")],
          mags=[],

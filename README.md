@@ -7,10 +7,13 @@ LEDs on the face strobe a "beacon me" pattern for the last few metres, and there
 
 ![Case, closed](docs/case-closed.png)
 
-76.4 mm across, 18.3 mm thick. Matte black body, orange anodised socket-cap bolts on the face that pass through
-the PCB, a 10 mm orange button at 6 o'clock, a clear bezel around the crystal that the four beacon LEDs light from
-below, and an orange index dot at 12 o'clock over the GPS patch, which looks through a 0.9 mm skin. The back
-carries a debossed radar dial, the name and a 1 / 2 field. The case is designed to IP55 (dust protected, water
+76.4 mm across, 18.3 mm thick. The body is a CNC-machined 6061 aluminium shell, black anodised, under a matte black
+plastic face; between 12 and 4 o'clock the side wall is a black plastic antenna window, because aluminium would
+block the radios (see [Aluminium shell and the radios](#aluminium-shell-and-the-radios)). Orange anodised
+socket-cap bolts on the face pass through the PCB, a 10 mm orange button at 6 o'clock, a clear bezel around the
+crystal that the four beacon LEDs light from below, and an orange index dot at 12 o'clock over the GPS patch, which
+looks through a 0.9 mm skin. The back is plain anodised aluminium with the Open Source Hardware logo V-carved through
+to bare metal; the cord goes in at the side at 6 o'clock and out of the back. The case is designed to IP55 (dust protected, water
 jets from any direction) with the USB-C door slid shut and the switch plug pushed home; see [Sealing (IP55)](#sealing-ip55).
 [Build guide (PDF)](docs/finder_puck_build_guide.pdf).
 
@@ -28,8 +31,10 @@ jets from any direction) with the USB-C door slid shut and the switch plug pushe
 | `fab/finder_puck_gerbers.zip` | Gerbers and drill files |
 | `fab/finder_puck_bom.csv`, `fab/finder_puck_cpl.csv` | Assembly BOM and placement (JLCPCB column names) |
 | `mech/finder_puck.step`, `mech/finder_puck_features.json` | Populated board in 3D, and everything the case needs from it |
-| `case/finder_puck_case.FCStd` | FreeCAD assembly: board, panel, crystal, battery, motor, antenna, bolts, inserts, shell, plate, ring, bezel, cap |
-| `case/finder_puck_{shell,plate,ring,bezel,cap}.stl` | Print files; `case/finder_puck_case.step` for other CAD |
+| `case/finder_puck_case.FCStd` | FreeCAD assembly: board, panel, crystal, battery, motor, antenna, bolts, shell, window, plate, ring, bezel, cap |
+| `case/finder_puck_case.step` | All made parts in STEP: the machine shop quotes the shell from this |
+| `case/finder_puck_{window,plate,ring,bezel,cap}.stl` | Print files (`finder_puck_shell.stl` too, for previews) |
+| `case/finder_puck_logo_vcarve.svg`, `case/oshw_logo.svg` | 1:1 V-carve drawing of the back's logo for the machinist; the logo's source path (Simple Icons, CC0) |
 | `case/finder_puck_gaskets.svg` | 1:1 cutting template for the lid, crystal and door gaskets |
 | `case/finder_puck_{door,switchplug}.stl` | The sliding USB-C door and the TPU switch plug |
 | `docs/finder_puck_build_guide.pdf` | Step-by-step assembly guide (IKEA style) |
@@ -72,21 +77,27 @@ The panel's FPC pinout (1–12): GND, LEDK, LEDA, VDD, GND, GND, D/C, CS, SCL, S
 
 Z = 0 is the top of the PCB.
 
-- **Shell** (black): 1.8 mm floor with the radar dial, "FINDER PUCK" and a 1 / 2 field debossed into it, a bay
-  for a 503450-class LiPo (34.5 × 52 × 5.3 mm, on 0.5 mm foam), a pocket for the 10 mm coin motor at 2 o'clock,
-  four Ø8 mm bosses with M2.5 heat-set inserts, a rim ledge the board rests on (cut away between 12 and
-  3 o'clock, where a 48 × 7 mm adhesive 915 MHz flex antenna is stuck to the inside of the wall, standing on
-  edge just outside the board rather than lying under its ground plane), and a lanyard tunnel (Ø2.8 mm chord)
-  through a thickening of the wall at 6 o'clock, and a finger scallop outside the switch slot (slot and scallop
-  both stay below the rim, so the seam seal passes over them unbroken). The wall's top carries a 0.65 mm lap lip
-  at its inner edge (r 35.8–36.45, overhanging the inside on a 45° underside, left out over the GPS module's
-  corners and over the board notch) and, outside it, the 1.5 mm seat for the seam seal. A Ø1.6 blind hole in
-  the scallop takes the switch plug's tether pin. Round the USB-C opening the wall is pocketed 1.1 mm deep
-  (r 37.1) over 50° for the sliding door, with a groove at the pocket's bottom edge (the plate carries the top
-  one) and a 1.2 mm sealing land round the opening, raised to r 37.35 with a lead-in step at both ends. The chord leaves
-  the round wall at a grazing 16°, so both bore mouths are filleted (0.45 mm) rather than left as knife edges
-  for the cord to saw on.
-- **Board** sits on the ledge (a 2 mm rim with a 45° underside); the motor lead comes up through H5 next to J5,
+- **Shell** (6061-T6, black anodised): machined in three setups, from the top, the back and the side, with no
+  undercuts. A 1.8 mm floor, a bay for a 503450-class LiPo (34.5 × 52 × 5.3 mm, on 0.5 mm foam) whose wall is a
+  Ø68.8 bore under the board's Ø72.8 one, so the step between them is the 2 mm ledge the board rests on; four
+  Ø6.5 bosses with tapped M2.5 holes (5 mm of thread, blind) that run into the bay's wall with 1.5 mm inside radii
+  (a 3 mm cutter); a pocket for the 10 mm coin motor at 2 o'clock; a slot in the bay wall at 304° for the battery
+  lead and the antenna pigtail; and the switch slot (1 mm corner radii) with its finger scallop (2 mm radii) and the
+  switch plug's Ø1.6 pin hole, all below the rim, so the seam seal passes over them unbroken. Between 12 and 4
+  o'clock (−38° to 81° at the floor) the wall is cut down to the floor for the antenna window, and the cut's two
+  ends are 60° flanks, so the window gasket on them is squeezed by the bolts like the rim seal is; the boss at 45°
+  stands on its own there. Two Ø2.1 holes in that floor take the window's pegs. The outer edge of the back has a
+  1 mm radius. The back is plain apart from the Open Source Hardware logo, 22 mm across, V-carved with a 90° bit to a
+  0.4 mm flat depth (45° walls, a flat floor, sharp outside corners), after anodising so it shows bare aluminium
+  (`case/finder_puck_logo_vcarve.svg` is the 1:1 drawing). The lanyard is two Ø3.0 holes drilled square to the
+  surface at 6 o'clock, one up from the back (r 35.3) and one in from the side (Z −6.2), meeting in a boss inside
+  the wall, with 0.4 mm countersinks on both mouths; deburr the inside of the bend.
+- **Window** (black, printed): the plastic wall that fills the shell's notch, 0.6 mm clear of the notch floor and
+  both flanks (normal to each face: the window gasket's squeeze), flush with the shell's rim at the top. It carries
+  the 915 MHz flex antenna on its inside, the USB-C opening up to the parting line, the door's pocket with its
+  sealing land and lower groove, and two feet inside the wall that stand on the shell's floor with Ø2 pegs in its
+  holes, which locate it and set the gasket's squeeze.
+- **Board** sits on the ledge (the 2 mm step between the two bores, cut away in the window); the motor lead comes up through H5 next to J5,
   and the battery lead and the antenna pigtail come up through a 4.5 mm notch in the board edge at 304°. J2 sits
   5.6 mm from the wall so the PH plug fits in front of it.
 - **Ring** (black): a short cup standing on the board on a 0.5 mm foam ring. Its 0.85 mm wall (Ø36.3 bore,
@@ -109,8 +120,9 @@ Z = 0 is the top of the PCB.
   GPS module (12 o'clock, 64–116°) the ring wall is thinned and nothing of the bezel beyond r 18.7 comes below
   the flange (Z 7.0, 0.2 mm over the tallest module). The ring used to be one part; a panel cannot be fitted past a ledge below it and a lip above it, hence the split. `LIP_PROUD`
   raises the lip's top above the face (default 0, see "Seeing the beacon from the side").
-- **Plate** (black): skin 1.6 mm, face at Z 8.6, Ø8 bosses down to the board (they, not the rim, are the datum:
-  the 1.5 mm skirt stops 0.6 mm above the shell's rim, the gap the 1.0 mm foam seal is squeezed into), Ø5.2
+- **Plate** (black): plastic on purpose, since it is the GPS patch's radome. Skin 1.6 mm, face at Z 8.6, Ø8 bosses
+  down to the board (they, not the rim, are the datum: the 1.8 mm skirt stops 0.6 mm above the rim of the shell and
+  the window, the gap the 1.0 mm foam seal is squeezed into), Ø5.2
   counterbores so the orange M2.5 × 12 socket-cap heads sit 0.2 mm proud on a 0.5 mm nylon washer (Ø3.0 bores,
   Ø2.8 holes in the board), the Ø44 bezel opening (0.3 mm reveal) with a pocket 0.7 mm deep under
   the skin for the bezel's flange and the lid gasket, the skin thinned to 0.9 mm over the GPS module out to the
@@ -118,13 +130,13 @@ Z = 0 is the top of the PCB.
   at 12 o'clock for a glued orange 1.75 mm filament stub, the Ø10.6 button bore (the bezel's sleeve continues
   it), a Ø1.4 bore for the charge-LED pipe, a 1.2 mm dimple beside the switch slot marking its ON end (towards 9 o'clock, away from the
   button: the PCM12 closes terminals 1–2 with the knob at the terminal-1 end, and terminal 1 is the grounded
-  one), and the 13.5 × 7.5 mm USB-C opening shared with the shell at the parting line.
+  one), and the 13.5 × 7.5 mm USB-C opening shared with the window at the parting line.
 - **Cap** (orange): Ø10, 1.5 mm proud, 1.0 mm edge radius, a Ø12.4 flange captive 0.1 mm under the bezel's
   sleeve (so the cap goes on before the bezel), a
   groove for a 9 × 1 mm silicone O-ring that seals against the sleeve's bore (0.8 mm gland, 20 % squeeze;
   the groove's upper wall is 45° so it prints pocket down), and a square pocket that sits on the PTS645 stem
   (a dot of glue keeps it there).
-- **USB-C door** (black): a 0.6 mm curved door, 16.7 mm wide, that slides 24.5° round the wall in its pocket,
+- **USB-C door** (black): a 0.6 mm curved door, 16.7 mm wide, that slides 24.5° round the window in its pocket,
   flush with the wall (0.05 mm proud, three grip ribs), held by tongues in the two grooves, so it is captive
   once the plate is on. A die-cut 0.5 mm closed-cell foam frame on its inside rides 0.05 mm clear of the pocket
   floor while it slides and is squeezed to 0.3 mm (40 %) on the land when it is shut: a sliding seal that only
@@ -133,40 +145,79 @@ Z = 0 is the top of the PCB.
 - **Switch plug** (TPU 85A–95A): its body fills the switch slot 0.1 mm oversize, 0.14 mm clear of the knob, its
   flange lies on the scallop floor, with a grip ridge and a strap to a pin glued into the shell. Lift it to
   switch on or off.
-- **Bolt path:** head → nylon washer → plate boss → PCB (plated, grounded 5.4 mm pad on both sides) → shell boss → insert.
-  Hand-tighten only; aluminium hex sockets strip. The bolts, inserts and index stub are in the FreeCAD model.
+- **Bolt path:** head → nylon washer → plate boss → PCB (plated, grounded 5.4 mm pad on both sides) → shell boss,
+  tapped M2.5. The bolt engages 4.1 mm of thread (1.6 × its diameter). Hand-tighten only; aluminium hex sockets
+  strip, and a smear of grease on the thread stops aluminium galling on aluminium. The bolts and index stub are in
+  the FreeCAD model; the threads are modelled at their nominal 2.5 mm, so the bolts show as touching the shell.
 
-`build_case.py` places every opening from the board's feature file and checks the seven printed parts against the
-populated board, panel, crystal, battery, motor, antenna, bolts, washers, inserts, the seam seal, the O-ring, the
-door, crystal and lid gaskets and each other, and against proxies
+`build_case.py` places every opening from the board's feature file and checks the eight made parts (the machined
+shell and seven printed parts) against the populated board, panel, crystal, battery, motor, antenna, bolts, washers,
+the seam seal, the window gasket, the O-ring, the door, crystal and lid gaskets and each other, and against proxies
 for what the board model lacks: the mated battery plug (a 6.85 × 5.8 × 4.5 mm PHR-2 housing standing 2 mm out
 of J2's mouth, 2.5 mm from the wall), the two battery wires and the pigtail standing side by side in the
 notch, the FPC's 0.45 mm fold bump under the panel chin, a USB-C plug's 12.35 × 6.5 mm overmold and the GPS
 module at its data-sheet limits (15.6 mm square, 6.8 mm tall, 0.3 mm de-paneling tabs at the PCB corners). The
 result must be 0 interferences. The switch plug's 0.1 mm squeeze into its slot is designed, so it is listed as a
 `squeeze` line rather than counted. The closed door is not checked against the cable-overmold proxy, since the
-two are never there at once; instead the door is also built slid open and checked against the shell, plate, seal
-and the overmold (the `door open` lines: no overlap, and more than 1 mm from the overmold). It also lists every printed-vs-other pair closer than
+two are never there at once; instead the door is also built slid open and checked against the window, plate, seal
+and the overmold (the `door open` lines: no overlap, and more than 1 mm from the overmold). It also lists every made-vs-other pair closer than
 0.3 mm with the nearest point (the `gap` lines); today that list is exactly the designed seats and fits and
-nothing else:
+nothing else. The `rf:` lines give how close the aluminium comes to the antenna and to the GPS module, and the
+`window gasket` line the length of foam strip to cut:
 
 | Gap | Pairs |
 |---|---|
-| contact | board on the shell ledge, motor in its pocket, antenna on the wall, plate bosses on the board, washers under the bolt heads in the counterbores, the seal between the shell rim and the plate skirt, the O-ring in the cap's groove and the bezel's sleeve, the door's gasket between the door and the land, the lid gasket between the bezel flange and the plate, the crystal gasket between the crystal and the lip, panel and crystal on the ring, bezel on the ring top, index stub on the bottom of its hole |
-| 0.025 mm | index stub in its hole (glued) |
-| 0.05 mm | the door in its pocket and its tongues in the grooves, the door over the seal's end |
+| contact | board on the shell ledge, motor in its pocket, bolts in the shell's threads (modelled at the nominal diameter), the window's feet on the shell floor, antenna on the window, plate bosses on the board, washers under the bolt heads in the counterbores, the seal between the rim of the shell and window and the plate skirt, the window gasket between the shell and the window, the O-ring in the cap's groove and the bezel's sleeve, the door's gasket between the door and the land, the lid gasket between the bezel flange and the plate, the crystal gasket between the crystal and the lip, panel and crystal on the ring, bezel on the ring top, index stub on the bottom of its hole |
+| 0.05 mm | the door in its pocket and its tongues in the grooves, the door over the seal's end, the window's pegs in their holes |
 | 0.1 mm | cap flange under the sleeve, cap pocket over the button body, charge-LED pipe in its bore |
 | 0.14 mm | switch plug over the switch knob |
-| 0.2 mm | shell lap lip under the plate, bezel over the panel (the compressed gasket), bezel over the crystal (its gasket), bezel flange over the GPS module at its tallest, USB-C plug overmold under the plate |
+| 0.2 mm | bezel over the panel (the compressed gasket), bezel over the crystal (its gasket), bezel flange over the GPS module at its tallest, USB-C plug overmold under the plate |
 | 0.25 mm | bolt shanks in the plate bores, ring foot over the board (the compressed foam ring) |
-| 0.3 mm | cap in the plate's bore |
+| 0.3 mm | cap in the plate's bore, USB-C plug overmold in the window's opening |
 
-Print the shell upright, the ring upside down (top face on the bed; slow the perimeters under its
+Machine the shell (see "Machining the shell" below). Print the window upside down (its rim on the bed), the ring upside down (top face on the bed; slow the perimeters under its
 0.85 mm ledge, and let the slicer print the single-perimeter 0.45 mm wall over the GPS arc as a thin wall), the
 plate face down and the cap pocket down, the door standing on its edge, and the switch plug in TPU (85A–95A)
 standing on its strap end. The
 outer edges on the bed are 45° chamfers. The bezel's flange is a horizontal shelf whichever way up it goes and its fits are 0.25 mm, so
 print it in clear resin (SLA); FDM needs supports under the flange and will not make clean light pipes.
+
+### Aluminium shell and the radios
+
+Aluminium blocks both radios, so nothing metal may sit between an antenna and the sky:
+
+- **GPS:** the SAM-M10Q's patch looks up through the plate's 0.9 mm skin, so the plate stays plastic. The shell's
+  wall comes within 0.5 mm of the module's corner at 12 o'clock (at the data sheet's limits), but its rim is at
+  Z 3.0, 3.4 mm below the top of the patch, so it sits beside the module's ground, not over the patch.
+- **LoRa:** the flex antenna moved from the shell's wall to the inside of the plastic window (14°–77°), raised
+  2 mm so its lower edge is 2.5 mm above the aluminium floor, with 4 mm of plastic to the flank at its 12 o'clock
+  end. The nearest aluminium is the bolt boss at 45°, 1.4 mm inside the antenna (the aluminium bolt and the board's
+  ground plane were already about as close in the printed case).
+- **Window, not slot:** a 915 MHz wave is 33 cm long; a small plastic window in a metal wall would pass very little,
+  so the window is a third of the wall, open above to the plastic plate.
+
+Nothing here has been measured. On the first pucks, compare the LoRa range and the GPS time to first fix
+against a puck in the previous revision's all-plastic case (tag it, or check out the commit before this change); if the range is short, try the antenna lower or
+higher on the window before anything else.
+
+### Machining the shell
+
+`case/finder_puck_case.step` holds the shell as a solid; quote it as 6061-T6, Type II black anodise (MIL-A-8625
+Type II, class 2, about 10–15 µm), ±0.05 mm on the two bores, the bosses' faces and the flanks, ±0.1 mm elsewhere,
+and with these notes:
+
+- Three setups. Top: the two bores, the bay and its bosses, the notch and its flanks (the flanks are planes, cut with
+  a radial-axis end mill or a 3-axis ball pass), the motor pocket, the cable slot, the peg holes, the M2.5 holes
+  (tap drill Ø2.05 × 6 mm, thread 5 mm, 0.3 mm countersink). Back: the 1 mm outer radius, the lanyard's back hole,
+  the logo. Side (4th axis or a vise on the flat of the back): the switch slot and scallop, the plug's pin hole, the
+  lanyard's side hole.
+- Smallest tool: 2 mm (the switch slot's 1 mm corners); bosses meet the bay wall with 1.5 mm radii; the 6 mm wide
+  cable slot is cut by a 3 mm cutter. Wall 1.8 mm, floor 1.8 mm; no undercuts.
+- Mask the tapped holes and the seal faces (rim, notch floor, flanks) from anodising, or chase the threads after.
+- V-carve the logo after anodising, with a 90° V-bit to a 0.4 mm flat depth (`case/finder_puck_logo_vcarve.svg`,
+  centred on the case axis, 12 o'clock up when you look at the back), so it reads as bare aluminium. Carved before
+  anodising, it would come out black on black.
+- Deburr the inside of the lanyard's bend so it does not saw the cord.
 
 ### Seeing the beacon from the side
 
@@ -197,17 +248,18 @@ IP55 is dust protected (no harmful deposit) and water jets from any direction (I
 
 | Path | Seal |
 |---|---|
-| Shell-to-plate seam | 1.0 mm closed-cell foam (EPDM, neoprene or PORON), 1.4 mm wide, on the shell's rim under the plate's 1.5 mm skirt, squeezed to 0.6 mm (40 %) by the bolted stack. The plate's bosses stay the datum, so the squeeze does not depend on how hard the bolts are done up. At the door it runs out to the pocket floor and the land, and it is open only across the USB-C opening itself, inside the door's gasket |
+| Shell-to-plate seam | 1.0 mm closed-cell foam (EPDM, neoprene or PORON), a 1.7 mm wide ring (Ø72.9–76.3) on the rim of the shell and the window under the plate's 1.8 mm skirt, squeezed to 0.6 mm (40 %) by the bolted stack. The plate's bosses stay the datum, so the squeeze does not depend on how hard the bolts are done up. At the door it runs out to the pocket floor and the land, and it is open only across the USB-C opening itself, inside the door's gasket |
+| Shell to window | a 1.0 mm closed-cell foam strip, 1.7 mm wide and about 103 mm long, along the notch floor and up both 60° flanks to the rim, where the seam seal's ring runs over its ends; squeezed to 0.6 mm normal to each face. The window's feet stand on the floor, so its squeeze is set by the parts, not by the bolts |
 | USB-C opening | Sliding door: a die-cut 0.5 mm closed-cell foam frame on its inside, squeezed 40 % on a raised land round the opening when shut (and clear of the pocket while sliding) |
 | Switch slot | TPU plug in the scallop; the slot no longer reaches the seam |
 | Button | 9 × 1 mm silicone O-ring on the cap, in the bezel's sleeve (grease it) |
-| Bolt bores | DIN 433 M2.5 nylon washer under each head; the insert holes in the shell are blind |
+| Bolt bores | DIN 433 M2.5 nylon washer under each head; the tapped holes in the shell are blind |
 | Crystal | die-cut 0.3 mm closed-cell foam ring on its edge, squeezed to 0.2 mm under the bezel's lip |
 | Bezel to plate | die-cut 0.3 mm closed-cell foam lid gasket on the bezel's flange, squeezed to 0.2 mm under the plate's pocket ceiling. It rings the opening and runs round the button bore (1.5 mm web) and the charge-LED pipe (1.1 mm web), so water down either bore stops at it |
 | Charge LED | a light pipe on the bezel, up through the skin: sealed by the lid gasket round it, not by a hole in the plate |
 | Index stub | glued into a blind hole, 0.3 mm of skin under it |
 | GPS window | the 0.9 mm skin (`GPS_WINDOW = "open"` cuts a hole and is not sealed; the build prints a CHECK) |
-| Lanyard tunnel | a bore through solid wall, not into the case |
+| Lanyard hole | two holes meeting in a solid boss, not into the case; the window's peg holes are blind and inside the seal |
 
 Nothing is glued or potted: the lid (plate, bezel, crystal, cap) comes off as one piece with the four bolts, so
 the panel stays reachable, and the gaskets are cut again from the 1:1 template `case/finder_puck_gaskets.svg`
@@ -233,7 +285,9 @@ Made in Blender 3.5 (Cycles, Metal GPU) from the FreeCAD assembly. `regen.sh` do
     MESH_DIR=case/blender_mesh /Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd case/export_meshes.py
     blender -b --python case/render_blender.py -- hero,pair,back 512 2400
 
-The screen graphics, the cord and the cord lock exist only in the Blender scene. Each view is also saved as
+These renders predate the aluminium shell (they show the printed case and the old debossed back); `render_blender.py`
+already has the anodised shell, the bare V-carve, the window and the new cord route, so re-run it. The screen
+graphics, the cord and the cord lock exist only in the Blender scene. Each view is also saved as
 `case/blender_mesh/finder_puck_<view>.blend` for hand tweaking. The hero's rim light is placed from the camera's
 mirror angle off the crystal; move that camera and the light's reflection slides onto the screen.
 
@@ -260,8 +314,9 @@ footprint. `make_models.py` refuses to overwrite a real model.
 - Board: DRC must report no violations and 0 unconnected (the generator prints it). The design rules are verified
   after loading; if they are not the project's, the build stops.
 - Schematic: run ERC in KiCad (Inspect → Electrical Rules Checker); KiCad 7 has no command-line ERC.
-- Case: 0 mm³ interference, printed in `build_case.py`'s output, followed by the `gap` list (every printed-vs-other
-  pair closer than 0.3 mm, which should be the designed seats and fits only) and a `mesh` line per STL (closed,
+- Case: 0 mm³ interference, printed in `build_case.py`'s output, followed by the `gap` list (every made-vs-other
+  pair closer than 0.3 mm, which should be the designed seats and fits only), the `rf:` lines (aluminium to the
+  antenna 1.4 mm, to the GPS module 0.5 mm, both beside rather than over them) and a `mesh` line per STL (closed,
   no self-intersections).
 
 ## Before ordering
@@ -275,9 +330,9 @@ footprint. `make_models.py` refuses to overwrite a real model.
 - **GPS footprint:** the SAM-M10Q sits on KiCad's SAM-M8Q footprint, which u-blox lists as pin-compatible.
   The panel's metal frame is closer to the module than u-blox likes (a few dB of margin); the open window compensates.
 - **Battery polarity:** J2 pin 1 is `+`. Many LiPo leads are wired the other way round; check with a meter.
-- **Antenna:** an adhesive flex antenna for 915 MHz no larger than 48 × 7 mm with a U.FL pigtail of at least
-  100 mm (2J 2JF0515P, 39.9 × 7 mm, fits); its cable end goes at 3 o'clock and the pigtail runs along the floor to
-  the notch at 304° and up to J4. Always connect it to J4 before the radio transmits.
+- **Antenna:** an adhesive flex antenna for 915 MHz no larger than 40 × 7 mm with a U.FL pigtail of at least
+  100 mm (2J 2JF0515P, 39.9 × 7 mm, fits); it goes on the inside of the plastic window, never on the aluminium. Its
+  cable end goes at 3 o'clock and the pigtail runs along the floor to the notch at 304° and up to J4. Always connect it to J4 before the radio transmits.
 - **Factory parts:** the RFM95W is not stocked by JLCPCB (consign it or hand-solder it); the SAM-M10Q is
   (C5443880). The BOM's LCSC column is filled for everything else: the named parts, and the passives by value
   and package (Samsung MLCCs and UNI-ROYAL 1 % resistors, checked on jlcpcb.com on 2026-10-20). All are
@@ -290,8 +345,9 @@ footprint. `make_models.py` refuses to overwrite a real model.
   U2–U5. Gerbers, drills and the CPL share the drill/place origin. Order with "min via hole 0.25 mm" and edge rails; tell them the switch knob (2 mm at 245°)
   protrudes past the round outline and that the notch at 304° is intended.
 - **Bolts:** M2.5 × 12 socket cap, aluminium (non-magnetic, matters for the compass 7 mm from one of them),
-  into Ruthex RX-M2.5x5.7 inserts (Ø4.6 knurl, 4.0 mm hole; the shell has 4.2). Print a hole coupon
-  (4.1/4.2/4.3 mm) before trusting the insert holes.
+  into M2.5 threads tapped in the aluminium shell (no inserts). Grease the threads.
+- **Shell:** machined and anodised to `case/finder_puck_case.step` with the notes in "Machining the shell". Check
+  the logo is carved after anodising and the tapped holes and seal faces were masked.
 - **Factory assembly:** JLCPCB's preview usually needs part rotations corrected. J3 (the panel) is soldered by
   hand; TP1/TP2 and H1–H5 are not parts. Match parts by the manufacturer numbers in the BOM.
 - **Crystal:** Ø37.5 × 1.0 mm flat mineral watch crystal (sold in 0.1 mm steps); it bears on a 0.6 mm land.
@@ -314,16 +370,16 @@ ordered. The rest can be ordered with the boards; the AliExpress lines take long
 | 1S LiPo, 503450 class, at most 34.5 × 52 × 5.3 mm with its protection board, 28 AWG leads about 50 mm long, JST PH 2.0 plug | Amazon [AKZYTUE 503450 1000 mAh](https://www.amazon.com/dp/B0GHR5J34D) (5 × 34 × 52 mm, protection board, PH 2.0, 50 mm leads). Mouser has no 503450 cell, and SparkFun's 1 Ah cell (PRT-13813, at DigiKey) is 5.9 mm thick and obsolete | 3 | $8 | 3–7 days | Meter the plug: `+` must land on J2 pin 1 (marked `+` on the board). If it is reversed, lift each latch with a needle and swap the two crimps |
 | Ø10 mm coin vibration motor, at most 3.4 mm thick, wire leads | [Mouser 485-1201](https://www.mouser.com/ProductDetail/485-1201) (Adafruit 1201, Ø10 × 2.7 mm; also DigiKey 1528-1177-ND) | 3 | $1.95 | In stock, 2–5 days | No more than 3.4 mm thick including its adhesive pad |
 | JST SH 1.0 mm 2-pin plug for the motor | [Mouser 306-ASSHSSH28K152](https://www.mouser.com/ProductDetail/306-ASSHSSH28K152) (pre-crimped SH lead, 28 AWG, 152 mm, a contact at each end: cut it in half for one motor) and [306-SHR-02V-S-B](https://www.mouser.com/ProductDetail/306-SHR-02V-S-B) housings, plus 1 mm heat-shrink. The housing does not pass the 2.5 mm hole H5: splice the leads to the motor below the board, feed the contacts up through H5, then click them into the housing | 4 leads, 5 housings | $0.49, $0.10 | In stock, 2–5 days | Tug each contact once it clicks into the housing |
-| 915 MHz adhesive flex antenna, no larger than 48 × 7 mm, U.FL pigtail of at least 100 mm | 2J 2JF0515P ([datasheet](https://www.2j-antennas.com/media/original/datasheets/2jf0515p.pdf), 39.9 × 7 mm) as [BIPOM 2JF0515P-010MC137-UFL](https://www.bipom.com/products/us/4388674.html) (100 mm of 1.37 mm cable). DigiKey and Mouser don't list it; the flex DigiKey offers first, Molex 211140, is 38 × 10 mm, too tall for the 7 mm strip of wall | 3 | $9 | 1–2 weeks | The plug is U.FL (MHF1) and clicks onto J4; the flex is no larger than 48 × 7 mm |
+| 915 MHz adhesive flex antenna, no larger than 40 × 7 mm, U.FL pigtail of at least 100 mm | 2J 2JF0515P ([datasheet](https://www.2j-antennas.com/media/original/datasheets/2jf0515p.pdf), 39.9 × 7 mm) as [BIPOM 2JF0515P-010MC137-UFL](https://www.bipom.com/products/us/4388674.html) (100 mm of 1.37 mm cable). DigiKey and Mouser don't list it; the flex DigiKey offers first, Molex 211140, is 38 × 10 mm, too tall for the 7 mm strip of window | 3 | $9 | 1–2 weeks | The plug is U.FL (MHF1) and clicks onto J4; the flex is no larger than 40 × 7 mm |
 | HopeRF RFM95W-915S2 (U2), not stocked by JLCPCB | [Mouser 223-RFM95W-915S2](https://www.mouser.com/ProductDetail/223-RFM95W-915S2) (listed under RF Solutions). Ship it to JLCPCB as a consigned part before the assembly order, or hand-solder it | 3 | $23.75 | In stock, 2–5 days | Marked 915 (the 868 MHz version looks the same) |
 | M2.5 × 12 socket-head cap screw (DIN 912), orange anodised aluminium | [AliExpress 1005006166415294](https://www.aliexpress.com/item/1005006166415294.html): pick m2.5x12 and orange, 10 a lot | 20 (8 used; aluminium sockets strip) | $2.30 for 10 | 2–3 weeks | A magnet does not pick them up (the compass is 7 mm from one) |
-| Heat-set insert, Ruthex RX-M2.5x5.7 | [3DJake, 70 pieces](https://www.3djake.com/ruthex/threaded-insert-m25-70-pieces) | 1 pack (8 used) | $8.50 | 1–2 weeks (ships from Austria) | Set one in each hole of the 4.1/4.2/4.3 mm coupon first |
+| Machined shell, 6061-T6, Type II black anodise | Any CNC service that takes STEP and anodises (JLCCNC, PCBWay, Xometry): upload the shell from `case/finder_puck_case.step` with the notes in "Machining the shell"; not yet quoted | 3 | (get a quote) | Usually 1–3 weeks | Calipers on the two bores (Ø72.8 and Ø68.8); a bolt runs into each tapped hole by hand; the logo is bright and the flanks are clean |
 | Foam, 0.5 mm, one adhesive side, at least 40 mm wide (battery pad, foam ring) | [AliExpress 1005006215361137](https://www.aliexpress.com/item/1005006215361137.html): black EVA, pick 0.5 mm × 50 mm (5 m) | 1 roll | $4 | 2–3 weeks | Calipers under light pressure: 0.4–0.6 mm |
 | Foam, 0.3 mm (gasket) | [AliExpress 1005006827632734](https://www.aliexpress.com/item/1005006827632734.html): Amaoe 0.3 mm PE foam tape, 10 mm wide. No wider 0.3 mm foam with one adhesive side turned up; this one is double-sided, so leave the top liner on, and cut the ring as four quarter-arcs, which fit the 10 mm width | 1 roll | $3 | 2–3 weeks | Calipers: 0.25–0.35 mm |
 | 0.2 mm PET or Kapton sheet (insulation, 36 × 52 mm) | [AliExpress 1005006263159926](https://www.aliexpress.com/item/1005006263159926.html): clear PET, pick "A4 Thick 0.2mm 10PCS" | 1 pack | $7 | 2–3 weeks | 0.15–0.25 mm thick (the bay leaves 0.5 mm above the cell) |
-| Ø2.5 mm cord, orange, 300 mm a puck | [AliExpress 32991846600](https://www.aliexpress.com/item/32991846600.html): 2.5 mm paracord in orange (it has a reflective tracer), 20 m | 1 | $1.30 | 2–3 weeks | No more than 2.6 mm across, so it threads the Ø2.8 mm tunnel (melt the ends to a point) |
-| 1.75 mm filament: orange (cap, index stub) and matte black (shell, plate, ring) | [Bambu Lab PLA Matte](https://us.store.bambulab.com/products/pla-matte) in Mandarin Orange and Charcoal, or any matte PLA; PETG if the puck may sit in a hot car. Two pucks take about 50 g of black and 2 g of orange | 1 spool each | $20 | A few days | A 1.75 mm offcut of the orange slides into the Ø1.8 mm index hole |
-| Closed-cell foam sheet, 1.0 mm and 0.5 mm, one adhesive side (seam seal: a 1.4 mm wide ring, Ø73.5–76.3 mm, cut with a compass cutter; door gasket: a 15.9 × 9.4 mm frame with a 13.7 × 7.2 mm hole) | EPDM, neoprene or PORON foam; not yet sourced, buy to the spec | 1 sheet | | | 1.0 mm under light pressure, closed cell (it does not soak up water) |
+| Ø2.5 mm cord, orange, 300 mm a puck | [AliExpress 32991846600](https://www.aliexpress.com/item/32991846600.html): 2.5 mm paracord in orange (it has a reflective tracer), 20 m | 1 | $1.30 | 2–3 weeks | No more than 2.6 mm across, so it goes round the bend in the Ø3 mm lanyard holes (melt the ends to a point and pull it through with a loop of thin wire) |
+| 1.75 mm filament: orange (cap, index stub) and matte black (window, plate, ring) | [Bambu Lab PLA Matte](https://us.store.bambulab.com/products/pla-matte) in Mandarin Orange and Charcoal, or any matte PLA; PETG if the puck may sit in a hot car. Two pucks take about 50 g of black and 2 g of orange | 1 spool each | $20 | A few days | A 1.75 mm offcut of the orange slides into the Ø1.8 mm index hole |
+| Closed-cell foam sheet, 1.0 mm and 0.5 mm, one adhesive side (seam seal: a 1.7 mm wide ring, Ø72.9–76.3 mm, cut with a compass cutter; window gasket: a 1.7 × 103 mm strip; door gasket: a 15.9 × 9.4 mm frame with a 13.7 × 7.2 mm hole) | EPDM, neoprene or PORON foam; not yet sourced, buy to the spec | 1 sheet | | | 1.0 mm under light pressure, closed cell (it does not soak up water) |
 | O-ring 9 × 1 mm (ID × section), silicone (button) | Any metric O-ring kit or seller; not yet sourced | 4 | | | 1.0 mm section; it sits in the cap's groove without stretching |
 | Nylon washer DIN 433 M2.5 (2.7 × 5 × 0.5 mm) | Any; not yet sourced | 10 | | | At most 5.0 mm across (the counterbore is Ø5.2) and 0.5 mm thick |
 | TPU filament 85A–95A, black (the switch plug) | Any; under 1 g a puck | 1 spool or offcut | | | |
@@ -331,11 +387,11 @@ ordered. The rest can be ordered with the boards; the AliExpress lines take long
 | Silicone grease (O-ring) | Any | 1 | | | |
 | Bezel in clear SLA resin | [JLC3DP](https://jlc3dp.com/3d-printing-quote): upload `case/finder_puck_bezel.stl` (1.5 cm³, 52 × 49 × 7 mm) in [8001 resin](https://jlc3dp.com/help/article/photosensitive-8001-resin), Transparent (sanded and oiled by default). Order it with the boards to share the shipping; any SLA bureau with a clear resin will do | 3 | $3–6 (get a quote) | About 3 days to print, then shipping | Dry-fit it over a printed ring with the crystal: the skirt locates and the crystal drops into its seat (JLC3DP quotes ±0.2 mm, the fits are 0.25 mm) |
 
-Rough total: about $215 of parts for two pucks with these spares, or $255 with both filament spools, plus
+Rough total: about $205 of parts for two pucks with these spares, or $245 with both filament spools, plus
 roughly $40–60 of shipping across the separate orders. The three radio modules are a third of it. The Mouser lines
 (radio, motors, SH parts) make one order and the AliExpress lines another. The tools are listed in the build
-guide; the pre-crimped SH leads mean no crimper is needed. The sealing parts (foam, O-rings, nylon washers, TPU)
-are not priced yet and are not in that total.
+guide; the pre-crimped SH leads mean no crimper is needed. The machined shells and the sealing parts (foam,
+O-rings, nylon washers, TPU) are not priced yet and are not in that total.
 
 ## Build guide
 
