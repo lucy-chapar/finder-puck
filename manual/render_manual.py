@@ -52,10 +52,13 @@ REAL = {
     "Board": "dark", "Panel": "panel", "Crystal": "glass", "Battery": "foam", "Motor": "grey", "Antenna": "brass",
     "Index": "orange", "Cord": "orange", "FoamRing": "foam", "Gasket": "foam", "Pad": "foam", "Sheet": "amber",
     "FPCflat": "brass", "FPCfold": "brass", "MotorLead": "red", "Pigtail": "black", "BattLead": "red",
+    "Seal": "black", "ORing": "red", "Door": "black", "DoorGasket": "foam", "SwitchPlug": "black",
+    "CrystalGasket": "black", "LidGasket": "black",
 }
 for i in range(1, 5):
     REAL["Bolt%d" % i] = "orange"
     REAL["Insert%d" % i] = "brass"
+    REAL["Washer%d" % i] = "white"
 EDGE = (0.13, 0.13, 0.14)
 
 
@@ -143,7 +146,9 @@ def state(upto):
     order = [
         ("Shell",), ("Insert1", "Insert2", "Insert3", "Insert4"), ("Motor", "Antenna", "Pigtail"),
         ("Pad", "Battery", "Sheet", "BattLead"), ("Board", "MotorLead"), ("FoamRing", "Ring"), ("Panel", "FPCfold"),
-        ("Gasket", "Crystal"), ("Bezel",), ("Cap",), ("Plate", "Bolt1", "Bolt2", "Bolt3", "Bolt4"), ("Index", "Cord"),
+        ("Gasket", "Crystal", "CrystalGasket"), ("Cap", "ORing"), ("Bezel", "LidGasket"),
+        ("Seal", "Door", "DoorGasket", "Plate") + tuple("Washer%d" % i for i in range(1, 5)) + tuple("Bolt%d" % i for i in range(1, 5)),
+        ("Index", "Cord", "SwitchPlug"),
     ]
     show = {}
     for group in order[:upto + 1]:
@@ -191,12 +196,17 @@ def scenes():
         "card_bolt": {"Bolt1": "orange"}, "card_insert": {"Insert1": "brass"}, "card_index": {"Index": "orange"},
         "card_foamring": {"FoamRing": "foam"}, "card_gasket": {"Gasket": "foam"}, "card_pad": {"Pad": "foam"},
         "card_sheet": {"Sheet": "amber"}, "card_cord": {"Cord": "orange"},
+        "card_seal": {"Seal": "foam"}, "card_washer": {"Washer1": "white"}, "card_oring": {"ORing": "red"},
+        "card_door": {"Door": "grey"}, "card_doorgasket": {"DoorGasket": "foam"}, "card_swplug": {"SwitchPlug": "grey"},
+        "card_crystalgasket": {"CrystalGasket": "foam"}, "card_lidgasket": {"LidGasket": "foam"},
     }
     for name, show in cards.items():
         S[name] = dict(show=show, view="iso", W=CARD, H=CARD)
     S["card_shell"]["view"] = "iso_top"
     S["card_plate"]["view"] = "iso_top"
     S["card_index"]["move"] = {}
+    S["card_crystalgasket"]["view"] = "iso_top"
+    S["card_lidgasket"]["view"] = "iso_top"
 
     # Step 1: inserts into the shell.
     dz = 22.0
@@ -288,29 +298,32 @@ def scenes():
     s["anchors"]["j2"] = j2
     S["s09"] = s
     S["s09_mag_j2"] = dict(show=dict(state(6), BattLead="teal"), at=j2, height=14.0)
-    # Step 10: gasket and crystal.
-    s = dict(show=state(6), move={"Gasket": lift(9.0), "Crystal": lift(18.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"].update(Gasket="teal", Crystal="teal")
+    # Step 10: gasket, crystal and the crystal's gasket.
+    s = dict(show=state(6), move={"Gasket": lift(9.0), "Crystal": lift(18.0), "CrystalGasket": lift(27.0)},
+             anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Gasket="teal", Crystal="teal", CrystalGasket="teal")
     s["anchors"]["gasket_from"] = at(160, 17.0, bc.Z_PANEL_TOP + 9.0 - 0.3)
     s["anchors"]["gasket_to"] = at(160, 17.0, bc.Z_PANEL_TOP + 0.4)
     s["anchors"]["crystal_from"] = at(20, 17.5, bc.Z_CRYSTAL + 18.0 - 0.3)
     s["anchors"]["crystal_to"] = at(20, 17.5, bc.Z_CRYSTAL + 0.4)
+    s["anchors"]["cgasket_from"] = at(200, 18.1, bc.Z_CRYSTAL_TOP + 27.0 - 0.3)
+    s["anchors"]["cgasket_to"] = at(200, 18.1, bc.Z_LIP0 + 18.0 + 0.4)
     S["s10"] = s
-    # Step 11: bezel.
-    s = dict(show=state(7), move={"Bezel": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"]["Bezel"] = "teal"
+    # Step 11: cap, before the bezel (its flange is captive under the bezel's sleeve).
+    s = dict(show=state(7), move={"Cap": lift(20.0), "ORing": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Cap="teal", ORing="red")
+    s["anchors"]["cap_from"] = V(BTN[0], BTN[1], 4.0 + 20.0 - 0.5)
+    s["anchors"]["cap_to"] = V(BTN[0], BTN[1], bc.BUTTON["stem_height"] + 0.3)
+    S["s11"] = s
+    S["s11_mag"] = dict(show=state(8), at=V(BTN[0], BTN[1], 6.0), height=16.0)
+    # Step 12: bezel, with the lid gasket stuck on its flange.
+    s = dict(show=state(8), move={"Bezel": lift(20.0), "LidGasket": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Bezel="teal", LidGasket="foam")
     s["anchors"]["bezel_from"] = at(0, 20.5, bc.PIPE_Z0 + 20.0 - 0.3)
     s["anchors"]["bezel_to"] = at(0, 20.5, bc.Z_FACE + 0.3)
     s["anchors"]["pipe"] = V(LED_XY[3][0], LED_XY[3][1], 3.0)
-    S["s11"] = s
-    S["s11_mag"] = dict(show=state(8), at=V(LED_XY[3][0], LED_XY[3][1], 3.5), height=14.0)
-    # Step 12: cap.
-    s = dict(show=state(8), move={"Cap": lift(20.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"]["Cap"] = "teal"
-    s["anchors"]["cap_from"] = V(BTN[0], BTN[1], 4.0 + 20.0 - 0.5)
-    s["anchors"]["cap_to"] = V(BTN[0], BTN[1], bc.BUTTON["stem_height"] + 0.3)
     S["s12"] = s
-    S["s12_mag"] = dict(show=state(9), at=V(BTN[0], BTN[1], 6.0), height=16.0)
+    S["s12_mag"] = dict(show=state(9), at=V(LED_XY[3][0], LED_XY[3][1], 3.5), height=14.0)
     # Step 13: test before the plate goes on.
     s = dict(show=state(9), move={}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
     s["anchors"]["sw_from"] = at(F["power_switch"]["angle"], 48.0, 1.0)
@@ -320,21 +333,36 @@ def scenes():
     S["s13"] = s
     # Step 14: plate and bolts.
     dzp, dzb = 24.0, 52.0
-    s = dict(show=state(9), move={"Plate": lift(dzp)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"]["Plate"] = "teal"
+    dzs = 8.0
+    out_door = bc.at(F["usb"]["angle"], 12.0)                 # the door (with its gasket) drawn out from its pocket
+    mv_door = shift(out_door[0] - CX, out_door[1] - CY)
+    s = dict(show=state(9), move={"Plate": lift(dzp), "Seal": lift(dzs), "Door": mv_door, "DoorGasket": mv_door},
+             anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Plate="teal", Seal="teal", Door="teal", DoorGasket="teal")
+    s["anchors"]["door_from"] = at(F["usb"]["angle"], bc.DOOR_IN + bc.DOOR_T + 12.0, 1.5)
+    s["anchors"]["door_to"] = at(F["usb"]["angle"], bc.DOOR_IN + bc.DOOR_T + 0.5, 1.5)
+    s["anchors"]["seal_from"] = at(200, bc.R_OUT - 0.7, bc.Z_SPLIT + dzs - 0.3)
+    s["anchors"]["seal_to"] = at(200, bc.R_OUT - 0.7, bc.Z_SPLIT + 0.3)
     s["anchors"]["plate_from"] = at(270, 34.0, bc.Z_SPLIT + dzp - 0.5)
     s["anchors"]["plate_to"] = at(270, 34.0, bc.Z_SPLIT + 0.4)
     zh = bc.Z_FACE - (bc.HEAD_H - bc.HEAD_PROUD)
     for i, (px, py) in enumerate(BOLT_XY, 1):
         s["show"]["Bolt%d" % i] = "teal"
         s["move"]["Bolt%d" % i] = lift(dzb)
+        s["show"]["Washer%d" % i] = "teal"
+        s["move"]["Washer%d" % i] = lift(dzb - 4.0)
         s["anchors"]["bolt%d_from" % i] = V(px, py, zh - bc.BOLT_L + dzb - 0.5)
         s["anchors"]["bolt%d_to" % i] = V(px, py, bc.Z_FACE + dzp + 0.3)
     S["s14"] = s
     S["s14_mag"] = dict(show=state(10), at=V(BOLT_XY[1][0], BOLT_XY[1][1], bc.Z_FACE), height=11.0)
     # Step 15: index stub and cord.
-    s = dict(show=state(10), move={"Index": lift(12.0), "Cord": shift(0, -16.0)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"].update(Index="teal", Cord="teal")
+    out_sw = bc.at(F["power_switch"]["angle"], 14.0)            # the switch plug drawn pulled out of its slot
+    mv_sw = shift(out_sw[0] - CX, out_sw[1] - CY)
+    s = dict(show=state(10), move={"Index": lift(12.0), "Cord": shift(0, -16.0), "SwitchPlug": mv_sw},
+             anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Index="teal", Cord="teal", SwitchPlug="teal")
+    s["anchors"]["swplug_from"] = at(F["power_switch"]["angle"], bc.R_OUT + 13.0, 0.6)
+    s["anchors"]["swplug_to"] = at(F["power_switch"]["angle"], bc.R_OUT + 0.2, 0.6)
     s["anchors"]["index_from"] = V(CX, CY + bc.INDEX_R, bc.Z_FACE - bc.INDEX_DEPTH + 12.0 - 0.4)
     s["anchors"]["index_to"] = V(CX, CY + bc.INDEX_R, bc.Z_FACE + 0.3)
     s["anchors"]["cord_from"] = V(CX - HALF, CY - bc.LANYARD_R - 16.0 + 1.5, bc.LANYARD_Z)

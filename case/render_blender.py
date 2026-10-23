@@ -34,14 +34,14 @@ WIDTH = int(args[2]) if len(args) > 2 else 2400
 MM = 0.001
 CENTRE = Vector((36.0, -36.0, 0.0))        # board centre in the assembly frame
 Z_BOTTOM = -9.7                            # shell underside
-Z_FACE = 8.0                               # plate face
+Z_FACE = 8.6                               # plate face
 Z_SCREEN = 5.5                             # panel top; the crystal starts at 5.7
 R_ACTIVE = 32.4 / 2
 LANYARD_Y, LANYARD_Z = -35.3, -5.6         # chord bore along X (build_case.py LANYARD_R, LANYARD_Z)
 CORD_R = 1.0                               # 2 mm cord in the 2.8 mm bore
 LOCK_R, LOCK_L = 3.0, 9.0                  # barrel cord lock
 PARTS = ["Shell", "Plate", "Ring", "Bezel", "Cap", "Index", "Crystal", "Panel", "Board",
-         "Bolt1", "Bolt2", "Bolt3", "Bolt4"]
+         "Bolt1", "Bolt2", "Bolt3", "Bolt4", "Door", "SwitchPlug", "CrystalGasket"]
 
 
 # --- Scene ------------------------------------------------------------------
@@ -230,7 +230,8 @@ def rotated(points, deg):
 def import_parts(M):
     """Import every STL once; pucks are built from copies that share the mesh data."""
     mats = {"Shell": M["black"], "Plate": M["black"], "Ring": M["black"], "Cap": M["orange"], "Index": M["orange"],
-            "Bezel": M["resin"], "Crystal": M["crystal"], "Panel": M["panel"], "Board": M["mask"]}
+            "Bezel": M["resin"], "Crystal": M["crystal"], "Panel": M["panel"], "Board": M["mask"],
+            "Door": M["black"], "SwitchPlug": M["black"], "CrystalGasket": M["black"]}
     parts = {}
     for name in PARTS:
         path = os.path.join(MESH, name + ".stl")
@@ -464,7 +465,7 @@ def view_pair(scene, parts, M):
 
 def view_back(scene, parts, M):
     puck = make_puck("Puck", parts, M)
-    # Turned over like a pancake: the face (Z 8.0) rests on the floor, 12 o'clock stays away from the camera.
+    # Turned over like a pancake: the face (Z 8.6) rests on the floor, 12 o'clock stays away from the camera.
     puck.rotation_euler = (math.radians(180), 0, math.radians(166))
     puck.location = (0, 0, (Z_BOTTOM + Z_FACE) * MM)
     make_cord(puck, M, (1.0, -0.35))                         # off to the right
