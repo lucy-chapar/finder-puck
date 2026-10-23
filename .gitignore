@@ -1,0 +1,20 @@
+# KiCad per-user, lock and cache files
+*.kicad_prl
+*.lck
+fp-info-cache
+*-backups/
+_autosave-*
+
+# Generator, render and build intermediates
+/logs/
+__pycache__/
+/case/blender_mesh/
+/manual/img/render.done
+/manual/img/render.log
+/manual/img/only.txt
+.pio/
+
+# OS, editor and local tool settings
+.DS_Store
+/.claude/settings.local.json
+/CLAUDE.local.md
