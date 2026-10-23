@@ -10,7 +10,7 @@ FREECADCMD=/Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd
 if [ "$1" != "--case-only" ]; then
     "$KICAD_PY" -u tools/generate_puck.py
 fi
-"$FREECADCMD" case/build_case.py 2>&1 | grep -E "overlap|gap |lanyard|mesh |case:|wrote|Error|Traceback"
+"$FREECADCMD" case/build_case.py 2>&1 | grep -E "overlap|squeeze|gap |lanyard|mesh |case:|CHECK|wrote|Error|Traceback"
 rm -rf case/__pycache__
 # Previews need the FreeCAD GUI; it opens and closes a window.
 open -n -a /Applications/FreeCAD.app --args "$PWD/case/render_case.py"
