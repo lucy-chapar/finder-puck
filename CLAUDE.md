@@ -33,10 +33,11 @@ vendored as `tools/kicad_helpers.py`; its own Digital Sand paths are unused or o
   Expected: 0 errors and 1 warning (U4 SDO/SA0 on GND, which carries a power flag). Eeschema rewrites
   `finder_puck.kicad_pro` when it quits and leaves `.kicad_prl` and `.lck` files: restore the project file with
   `git checkout finder_puck.kicad_pro` afterwards.
-- Case: `case/build_case.py` (freecadcmd) builds shell, plate, ring, bezel, cap and the two TPU plugs (USB-C,
-  switch), plus the bolts, washers, inserts, index stub, flex antenna, seam seal, O-ring and interference proxies as
+- Case: `case/build_case.py` (freecadcmd) builds shell, plate, ring, bezel, cap, the sliding USB-C door and the
+  TPU switch plug, plus the bolts, washers, inserts, index stub, flex antenna, seam seal, O-ring, door gasket and interference proxies as
   reference solids, from `mech/`. It must report 0 interferences, its `gap` lines (every printed-vs-other pair under
-  0.3 mm) must be designed seats only, its `squeeze` lines (the plugs' 0.1 mm press fit) non-zero, and its `mesh`
+  0.3 mm) must be designed seats only, its `squeeze` line (the switch plug's 0.1 mm press fit) non-zero, its `door open` lines
+  free of overlap, and its `mesh`
   lines must say closed, 0 self-intersections. IP55 depends on every seal in README "Sealing (IP55)"; a change
   that opens a new path into the case (an opening across the seam, a through hole) needs a seal of its own. The script only builds when run as `build_case.py` (freecadcmd never sets
   `__main__`); the renderers import it for the parameters. Previews need the FreeCAD GUI:

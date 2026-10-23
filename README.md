@@ -11,7 +11,7 @@ LEDs on the face strobe a "beacon me" pattern for the last few metres, and there
 the PCB, a 10 mm orange button at 6 o'clock, a clear bezel around the crystal that the four beacon LEDs light from
 below, and an orange index dot at 12 o'clock over the GPS patch, which looks through a 0.8 mm skin. The back
 carries a debossed radar dial, the name and a 1 / 2 field. The case is designed to IP55 (dust protected, water
-jets from any direction) with its two TPU plugs pushed home; see [Sealing (IP55)](#sealing-ip55).
+jets from any direction) with the USB-C door slid shut and the switch plug pushed home; see [Sealing (IP55)](#sealing-ip55).
 [Build guide (PDF)](docs/finder_puck_build_guide.pdf).
 
 ![Board, component side](docs/pcb-front.png)
@@ -30,7 +30,7 @@ jets from any direction) with its two TPU plugs pushed home; see [Sealing (IP55)
 | `mech/finder_puck.step`, `mech/finder_puck_features.json` | Populated board in 3D, and everything the case needs from it |
 | `case/finder_puck_case.FCStd` | FreeCAD assembly: board, panel, crystal, battery, motor, antenna, bolts, inserts, shell, plate, ring, bezel, cap |
 | `case/finder_puck_{shell,plate,ring,bezel,cap}.stl` | Print files; `case/finder_puck_case.step` for other CAD |
-| `case/finder_puck_{usbplug,switchplug}.stl` | The two TPU plugs that seal the USB-C and switch openings |
+| `case/finder_puck_{door,switchplug}.stl` | The sliding USB-C door and the TPU switch plug |
 | `docs/finder_puck_build_guide.pdf` | Step-by-step assembly guide (IKEA style) |
 | `manual/` | The guide's content, renderer and layout scripts |
 | `docs/finder_puck_render{,_pair,_back}.png` | Blender studio renders: the puck searching, the pair that found each other (beacons lit), the back |
@@ -79,8 +79,10 @@ Z = 0 is the top of the PCB.
   through a thickening of the wall at 6 o'clock, and a finger scallop outside the switch slot (slot and scallop
   both stay below the rim, so the seam seal passes over them unbroken). The wall's top carries a 0.65 mm lap lip
   at its inner edge (r 35.8–36.45, overhanging the inside on a 45° underside, left out over the GPS module's
-  corners and over the board notch) and, outside it, the 1.5 mm seat for the seam seal. Two Ø1.6 blind holes
-  take the plug tethers' pins, under the USB-C opening and inside the scallop. The chord leaves
+  corners and over the board notch) and, outside it, the 1.5 mm seat for the seam seal. A Ø1.6 blind hole in
+  the scallop takes the switch plug's tether pin. Round the USB-C opening the wall is pocketed 1.1 mm deep
+  (r 37.1) over 50° for the sliding door, with a groove at the pocket's bottom edge (the plate carries the top
+  one) and a 1.2 mm sealing land round the opening, raised to r 37.35 with a lead-in step at both ends. The chord leaves
   the round wall at a grazing 16°, so both bore mouths are filleted (0.45 mm) rather than left as knife edges
   for the cord to saw on.
 - **Board** sits on the ledge (a 2 mm rim with a 45° underside); the motor lead comes up through H5 next to J5,
@@ -116,39 +118,46 @@ Z = 0 is the top of the PCB.
   groove for a 9 × 1 mm silicone O-ring that seals against the sleeve's bore (0.8 mm gland, 20 % squeeze;
   the groove's upper wall is 45° so it prints pocket down), and a square pocket that sits on the PTS645 stem
   (a dot of glue keeps it there).
-- **Plugs** (TPU 85A–95A): the USB-C plug's body fills the opening 0.1 mm oversize all round, its 0.7 mm flange
-  lies on the wall 1.5 mm beyond it (across the seam seal's two ends), with a grip ridge and a strap down to a
-  pin glued into the shell. The switch plug sits in the scallop the same way, its body 0.14 mm clear of the
-  knob. Lift it to switch on or off.
+- **USB-C door** (black): a 0.6 mm curved door, 16.7 mm wide, that slides 24.5° round the wall in its pocket,
+  flush with the wall (0.05 mm proud, three grip ribs), held by tongues in the two grooves, so it is captive
+  once the plate is on. A die-cut 0.5 mm closed-cell foam frame on its inside rides 0.05 mm clear of the pocket
+  floor while it slides and is squeezed to 0.3 mm (40 %) on the land when it is shut: a sliding seal that only
+  compresses at the end of its travel, so it doesn't drag or wear. Shut is towards 3 o'clock (the pocket's end
+  stops it over the land); open uncovers the whole USB-C plug overmold.
+- **Switch plug** (TPU 85A–95A): its body fills the switch slot 0.1 mm oversize, 0.14 mm clear of the knob, its
+  flange lies on the scallop floor, with a grip ridge and a strap to a pin glued into the shell. Lift it to
+  switch on or off.
 - **Bolt path:** head → nylon washer → plate boss → PCB (plated, grounded 5.4 mm pad on both sides) → shell boss → insert.
   Hand-tighten only; aluminium hex sockets strip. The bolts, inserts and index stub are in the FreeCAD model.
 
 `build_case.py` places every opening from the board's feature file and checks the seven printed parts against the
-populated board, panel, crystal, battery, motor, antenna, bolts, washers, inserts, the seam seal, the O-ring and
-each other, and against proxies
+populated board, panel, crystal, battery, motor, antenna, bolts, washers, inserts, the seam seal, the O-ring, the
+door gasket and each other, and against proxies
 for what the board model lacks: the mated battery plug (a 6.85 × 5.8 × 4.5 mm PHR-2 housing standing 2 mm out
 of J2's mouth, 2.5 mm from the wall), the two battery wires and the pigtail standing side by side in the
 notch, the FPC's 0.45 mm fold bump under the panel chin, a USB-C plug's 12.35 × 6.5 mm overmold and the GPS
 module at its data-sheet limits (15.6 mm square, 6.8 mm tall, 0.3 mm de-paneling tabs at the PCB corners). The
-result must be 0 interferences. The plug bodies' 0.1 mm squeeze into their openings is designed, so it is listed
-as `squeeze` lines (plug vs shell, plate and seal) rather than counted; the USB-C plug is not checked against the
-cable-overmold proxy, since the two are never in at once. It also lists every printed-vs-other pair closer than
+result must be 0 interferences. The switch plug's 0.1 mm squeeze into its slot is designed, so it is listed as a
+`squeeze` line rather than counted. The closed door is not checked against the cable-overmold proxy, since the
+two are never there at once; instead the door is also built slid open and checked against the shell, plate, seal
+and the overmold (the `door open` lines: no overlap, and more than 1 mm from the overmold). It also lists every printed-vs-other pair closer than
 0.3 mm with the nearest point (the `gap` lines); today that list is exactly the designed seats and fits and
 nothing else:
 
 | Gap | Pairs |
 |---|---|
-| contact | board on the shell ledge, motor in its pocket, antenna on the wall, plate bosses on the board, washers under the bolt heads in the counterbores, the seal between the shell rim and the plate skirt, the O-ring in the cap's groove and the sleeve, bezel flange under the skin, panel and crystal on the ring, bezel on the ring top, lip on the crystal |
+| contact | board on the shell ledge, motor in its pocket, antenna on the wall, plate bosses on the board, washers under the bolt heads in the counterbores, the seal between the shell rim and the plate skirt, the O-ring in the cap's groove and the sleeve, the door's gasket between the door and the land, bezel flange under the skin, panel and crystal on the ring, bezel on the ring top, lip on the crystal |
 | 0.025 mm | index stub in its hole (glued) |
+| 0.05 mm | the door in its pocket and its tongues in the grooves, the door over the seal's end |
 | 0.1 mm | cap flange under the sleeve, cap pocket over the button body |
 | 0.14 mm | switch plug over the switch knob |
-| 0.2 mm | shell lap lip under the plate, bezel over the panel (the compressed gasket) |
+| 0.2 mm | shell lap lip under the plate, bezel over the panel (the compressed gasket), USB-C plug overmold under the plate |
 | 0.25 mm | bolt shanks in the plate bores, ring foot over the board (the compressed foam ring) |
-| 0.3 mm | USB-C plug over the board edge |
 
 Print the shell upright, the ring upside down (top face on the bed; slow the perimeters under its
 0.85 mm ledge, and let the slicer print the single-perimeter 0.45 mm wall over the GPS arc as a thin wall), the
-plate face down and the cap pocket down, and the two plugs in TPU (85A–95A) standing on their strap ends. The
+plate face down and the cap pocket down, the door standing on its edge, and the switch plug in TPU (85A–95A)
+standing on its strap end. The
 outer edges on the bed are 45° chamfers. The bezel's flange is a horizontal shelf whichever way up it goes and its fits are 0.25 mm, so
 print it in clear resin (SLA); FDM needs supports under the flange and will not make clean light pipes.
 
@@ -181,8 +190,8 @@ IP55 is dust protected (no harmful deposit) and water jets from any direction (I
 
 | Path | Seal |
 |---|---|
-| Shell-to-plate seam | 1.0 mm closed-cell foam (EPDM, neoprene or PORON), 1.4 mm wide, on the shell's rim under the plate's 1.5 mm skirt, squeezed to 0.6 mm (40 %) by the bolted stack. The plate's bosses stay the datum, so the squeeze does not depend on how hard the bolts are done up. The ring is open only across the USB-C opening, under that plug's flange |
-| USB-C opening | TPU plug, 0.1 mm oversize in the opening, flange over the seal's ends |
+| Shell-to-plate seam | 1.0 mm closed-cell foam (EPDM, neoprene or PORON), 1.4 mm wide, on the shell's rim under the plate's 1.5 mm skirt, squeezed to 0.6 mm (40 %) by the bolted stack. The plate's bosses stay the datum, so the squeeze does not depend on how hard the bolts are done up. At the door it runs out to the pocket floor and the land, and it is open only across the USB-C opening itself, inside the door's gasket |
+| USB-C opening | Sliding door: a die-cut 0.5 mm closed-cell foam frame on its inside, squeezed 40 % on a raised land round the opening when shut (and clear of the pocket while sliding) |
 | Switch slot | TPU plug in the scallop; the slot no longer reaches the seam |
 | Button | 9 × 1 mm silicone O-ring on the cap, in the plate's sleeve (grease it) |
 | Bolt bores | DIN 433 M2.5 nylon washer under each head; the insert holes in the shell are blind |
@@ -303,10 +312,10 @@ ordered. The rest can be ordered with the boards; the AliExpress lines take long
 | 0.2 mm PET or Kapton sheet (insulation, 36 × 52 mm) | [AliExpress 1005006263159926](https://www.aliexpress.com/item/1005006263159926.html): clear PET, pick "A4 Thick 0.2mm 10PCS" | 1 pack | $7 | 2–3 weeks | 0.15–0.25 mm thick (the bay leaves 0.5 mm above the cell) |
 | Ø2.5 mm cord, orange, 300 mm a puck | [AliExpress 32991846600](https://www.aliexpress.com/item/32991846600.html): 2.5 mm paracord in orange (it has a reflective tracer), 20 m | 1 | $1.30 | 2–3 weeks | No more than 2.6 mm across, so it threads the Ø2.8 mm tunnel (melt the ends to a point) |
 | 1.75 mm filament: orange (cap, index stub) and matte black (shell, plate, ring) | [Bambu Lab PLA Matte](https://us.store.bambulab.com/products/pla-matte) in Mandarin Orange and Charcoal, or any matte PLA; PETG if the puck may sit in a hot car. Two pucks take about 50 g of black and 2 g of orange | 1 spool each | $20 | A few days | A 1.75 mm offcut of the orange slides into the Ø1.8 mm index hole |
-| Closed-cell foam sheet, 1.0 mm, one adhesive side (seam seal, a 1.4 mm wide ring, Ø73.5–76.3 mm, cut with a compass cutter) | EPDM, neoprene or PORON foam; not yet sourced, buy to the spec | 1 sheet | | | 1.0 mm under light pressure, closed cell (it does not soak up water) |
+| Closed-cell foam sheet, 1.0 mm and 0.5 mm, one adhesive side (seam seal: a 1.4 mm wide ring, Ø73.5–76.3 mm, cut with a compass cutter; door gasket: a 15.9 × 9.4 mm frame with a 13.7 × 7.2 mm hole) | EPDM, neoprene or PORON foam; not yet sourced, buy to the spec | 1 sheet | | | 1.0 mm under light pressure, closed cell (it does not soak up water) |
 | O-ring 9 × 1 mm (ID × section), silicone (button) | Any metric O-ring kit or seller; not yet sourced | 4 | | | 1.0 mm section; it sits in the cap's groove without stretching |
 | Nylon washer DIN 433 M2.5 (2.7 × 5 × 0.5 mm) | Any; not yet sourced | 10 | | | At most 5.0 mm across (the counterbore is Ø5.2) and 0.5 mm thick |
-| TPU filament 85A–95A, black (the two plugs) | Any; under 1 g a puck | 1 spool or offcut | | | |
+| TPU filament 85A–95A, black (the switch plug) | Any; under 1 g a puck | 1 spool or offcut | | | |
 | Clear UV resin and a UV torch (crystal, bezel, pinhole) | Any jewellery or repair UV resin | 1 | | | It cures through the clear bezel in under a minute |
 | Silicone grease (O-ring) | Any | 1 | | | |
 | Bezel in clear SLA resin | [JLC3DP](https://jlc3dp.com/3d-printing-quote): upload `case/finder_puck_bezel.stl` (1.5 cm³, 52 × 49 × 7 mm) in [8001 resin](https://jlc3dp.com/help/article/photosensitive-8001-resin), Transparent (sanded and oiled by default). Order it with the boards to share the shipping; any SLA bureau with a clear resin will do | 3 | $3–6 (get a quote) | About 3 days to print, then shipping | Dry-fit it over a printed ring with the crystal: the skirt locates and the crystal drops into its seat (JLC3DP quotes ±0.2 mm, the fits are 0.25 mm) |

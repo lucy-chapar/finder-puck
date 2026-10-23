@@ -28,7 +28,7 @@ PARTS = {
     "ring":    ("printed", "Ring", 1, "black", "card_ring"),
     "bezel":   ("printed", "Bezel", 1, "clear resin", "card_bezel"),
     "cap":     ("printed", "Button cap", 1, "orange", "card_cap"),
-    "usbplug": ("printed", "USB-C plug", 1, "TPU 85A–95A, black", "card_usbplug"),
+    "door":    ("printed", "USB-C door", 1, "black", "card_door"),
     "swplug":  ("printed", "Switch plug", 1, "TPU 85A–95A, black", "card_swplug"),
     "board":   ("electronics", "Assembled board", 1, "factory-assembled PCB", "card_board"),
     "panel":   ("electronics", "Round display", 1, "1.28″ GC9A01, bare panel", "card_panel"),
@@ -47,6 +47,7 @@ PARTS = {
     "seal":    ("hardware", "Seam seal", 1, "1.0 mm closed-cell foam, Ø73.5–76.3 mm, open at 3 o'clock", "card_seal"),
     "washer":  ("hardware", "Washer M2.5", 4, "nylon DIN 433, 5 × 2.7 × 0.5 mm", "card_washer"),
     "oring":   ("hardware", "O-ring", 1, "9 × 1 mm silicone", "card_oring"),
+    "doorgasket": ("hardware", "Door gasket", 1, "0.5 mm closed-cell foam frame, 15.9 × 9.4 mm, 13.7 × 7.2 mm hole", "card_doorgasket"),
 }
 PART_GROUPS = (("printed", "3D printed"), ("electronics", "Electronics"), ("hardware", "Hardware"))
 
@@ -72,11 +73,11 @@ TOOL_GROUPS = (("required", "Required"), ("recommended", "Recommended"))
 BEFORE = (
     ("Print", "Shell upright, ring upside down (top face on the bed), plate face down, cap pocket down; 0.2 mm "
               "layers, four walls. Print the bezel in clear resin: its flange cannot be bridged and its fits are "
-              "0.25 mm. Print the two plugs in TPU, standing on their strap ends. Print a hole coupon before "
+              "0.25 mm. Print the door standing on its edge and the switch plug in TPU, standing on its strap end. Print a hole coupon before "
               "trusting the insert holes."),
     ("Sealing", "The puck is built to IP55 (dust, water jets). That holds only with every seal in: the seam seal, "
                 "a washer under each bolt head, the O-ring on the cap, UV resin round the crystal and the bezel, "
-                "resin in the pinhole and both plugs pushed fully home. Cut the seam seal with a compass cutter."),
+                "resin in the pinhole, the door slid shut and the switch plug pushed fully home. Cut the seam seal with a compass cutter."),
     ("Panel first", "Buy two panels. Before anything else, look at the flex: after it folds under the glass, pin 1 "
                     "must land on the 3 o'clock side of the board's pads. If yours is mirrored, the board needs "
                     "regenerating with FPC_PIN1_RIGHT flipped, not a different fold."),
@@ -143,19 +144,19 @@ STEPS = (
          arrows=[("sw_from", "sw_to", "straight"), ("usb_from", "usb_to", "straight")],
          mags=[],
          note="Test before the plate goes on: plug in USB-C, flash the firmware, slide the switch toward the dot. The screen lights, the four LEDs strobe when you press the button, the motor ticks. Switch off again.", tool="usb"),
-    dict(scene="s14", parts=[("seal", 1), ("plate", 1), ("washer", 4), ("bolt", 4)],
-         arrows=[("seal_from", "seal_to", "straight"), ("plate_from", "plate_to", "straight")] + [("bolt%d_from" % i, "bolt%d_to" % i, "straight") for i in (1, 2, 3, 4)],
+    dict(scene="s14", parts=[("seal", 1), ("door", 1), ("doorgasket", 1), ("plate", 1), ("washer", 4), ("bolt", 4)],
+         arrows=[("seal_from", "seal_to", "straight"), ("door_from", "door_to", "straight"), ("plate_from", "plate_to", "straight")] + [("bolt%d_from" % i, "bolt%d_to" % i, "straight") for i in (1, 2, 3, 4)],
          mags=[("s14_mag", "bolt2_to", "tl", "")],
-         note="Stick the seal on the shell rim, its ends against the USB-C opening. Run UV resin round the bezel where it meets the plate, lower the plate over the bezel and cap, then the bolts, each on a washer. Hand-tight only, in a cross: aluminium sockets strip. Cure through the lip.", tool="hexkey"),
-    dict(scene="s15", parts=[("index", 1), ("cord", 1), ("usbplug", 1), ("swplug", 1)],
+         note="Stick the seal on the shell rim, its ends against the USB-C opening. Stick the gasket frame inside the door and hook the door into the groove under the opening, slid shut. Run UV resin round the bezel where it meets the plate, lower the plate over the bezel and cap, then the bolts, each on a washer. Hand-tight only, in a cross: aluminium sockets strip. Cure through the lip.", tool="hexkey"),
+    dict(scene="s15", parts=[("index", 1), ("cord", 1), ("swplug", 1)],
          arrows=[("index_from", "index_to", "straight"), ("cord_from", "cord_to", "straight"),
-                 ("usbplug_from", "usbplug_to", "straight"), ("swplug_from", "swplug_to", "straight")],
+                 ("swplug_from", "swplug_to", "straight")],
          mags=[("s15_mag", "index_to", "br", "")],
-         note="Glue the orange stub into the hole at 12 o'clock all round and trim it flush; fill the pinhole flush with UV resin and cure it. Glue each plug's pin into the hole under its opening and push the plugs home. Thread the cord in one mouth and out the other, then knot it.", tool="glue"),
+         note="Glue the orange stub into the hole at 12 o'clock all round and trim it flush; fill the pinhole flush with UV resin and cure it. Glue the switch plug's pin into the hole under the slot and push the plug home. Thread the cord in one mouth and out the other, then knot it.", tool="glue"),
     dict(scene="s16", parts=[],
          arrows=[("sw_from", "sw_to", "straight"), ("usb_from", "usb_to", "straight")],
          mags=[],
-         note="Lift the switch plug and slide the switch toward the dot to switch on. Charge through USB-C with the puck off and dry; the pinhole LED goes out when the cell is full. Push both plugs fully home before the puck gets wet. Mark it 1 or 2 on the back with the paint pen.", tool="pen"),
+         note="Lift the switch plug and slide the switch toward the dot to switch on. Charge through USB-C with the puck off and dry; the pinhole LED goes out when the cell is full. Slide the door shut (towards 3 o'clock) and push the switch plug home before the puck gets wet. Mark it 1 or 2 on the back with the paint pen.", tool="pen"),
 )
 
 # The last page before the back cover.

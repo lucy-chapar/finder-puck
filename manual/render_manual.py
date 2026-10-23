@@ -52,7 +52,7 @@ REAL = {
     "Board": "dark", "Panel": "panel", "Crystal": "glass", "Battery": "foam", "Motor": "grey", "Antenna": "brass",
     "Index": "orange", "Cord": "orange", "FoamRing": "foam", "Gasket": "foam", "Pad": "foam", "Sheet": "amber",
     "FPCflat": "brass", "FPCfold": "brass", "MotorLead": "red", "Pigtail": "black", "BattLead": "red",
-    "Seal": "black", "ORing": "red", "UsbPlug": "black", "SwitchPlug": "black",
+    "Seal": "black", "ORing": "red", "Door": "black", "DoorGasket": "foam", "SwitchPlug": "black",
 }
 for i in range(1, 5):
     REAL["Bolt%d" % i] = "orange"
@@ -146,8 +146,8 @@ def state(upto):
         ("Shell",), ("Insert1", "Insert2", "Insert3", "Insert4"), ("Motor", "Antenna", "Pigtail"),
         ("Pad", "Battery", "Sheet", "BattLead"), ("Board", "MotorLead"), ("FoamRing", "Ring"), ("Panel", "FPCfold"),
         ("Gasket", "Crystal"), ("Bezel",), ("Cap", "ORing"),
-        ("Seal", "Plate") + tuple("Washer%d" % i for i in range(1, 5)) + tuple("Bolt%d" % i for i in range(1, 5)),
-        ("Index", "Cord", "UsbPlug", "SwitchPlug"),
+        ("Seal", "Door", "DoorGasket", "Plate") + tuple("Washer%d" % i for i in range(1, 5)) + tuple("Bolt%d" % i for i in range(1, 5)),
+        ("Index", "Cord", "SwitchPlug"),
     ]
     show = {}
     for group in order[:upto + 1]:
@@ -196,7 +196,7 @@ def scenes():
         "card_foamring": {"FoamRing": "foam"}, "card_gasket": {"Gasket": "foam"}, "card_pad": {"Pad": "foam"},
         "card_sheet": {"Sheet": "amber"}, "card_cord": {"Cord": "orange"},
         "card_seal": {"Seal": "foam"}, "card_washer": {"Washer1": "white"}, "card_oring": {"ORing": "red"},
-        "card_usbplug": {"UsbPlug": "grey"}, "card_swplug": {"SwitchPlug": "grey"},
+        "card_door": {"Door": "grey"}, "card_doorgasket": {"DoorGasket": "foam"}, "card_swplug": {"SwitchPlug": "grey"},
     }
     for name, show in cards.items():
         S[name] = dict(show=show, view="iso", W=CARD, H=CARD)
@@ -327,8 +327,13 @@ def scenes():
     # Step 14: plate and bolts.
     dzp, dzb = 24.0, 52.0
     dzs = 8.0
-    s = dict(show=state(9), move={"Plate": lift(dzp), "Seal": lift(dzs)}, anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"].update(Plate="teal", Seal="teal")
+    out_door = bc.at(F["usb"]["angle"], 12.0)                 # the door (with its gasket) drawn out from its pocket
+    mv_door = shift(out_door[0] - CX, out_door[1] - CY)
+    s = dict(show=state(9), move={"Plate": lift(dzp), "Seal": lift(dzs), "Door": mv_door, "DoorGasket": mv_door},
+             anchors={}, view="iso", W=STEP_W, H=STEP_H)
+    s["show"].update(Plate="teal", Seal="teal", Door="teal", DoorGasket="teal")
+    s["anchors"]["door_from"] = at(F["usb"]["angle"], bc.DOOR_IN + bc.DOOR_T + 12.0, 1.5)
+    s["anchors"]["door_to"] = at(F["usb"]["angle"], bc.DOOR_IN + bc.DOOR_T + 0.5, 1.5)
     s["anchors"]["seal_from"] = at(200, bc.R_OUT - 0.7, bc.Z_SPLIT + dzs - 0.3)
     s["anchors"]["seal_to"] = at(200, bc.R_OUT - 0.7, bc.Z_SPLIT + 0.3)
     s["anchors"]["plate_from"] = at(270, 34.0, bc.Z_SPLIT + dzp - 0.5)
@@ -344,15 +349,11 @@ def scenes():
     S["s14"] = s
     S["s14_mag"] = dict(show=state(10), at=V(BOLT_XY[1][0], BOLT_XY[1][1], bc.Z_FACE), height=11.0)
     # Step 15: index stub and cord.
-    out_usb = bc.at(F["usb"]["angle"], 14.0)                   # the plugs drawn pulled straight out of their openings
-    out_sw = bc.at(F["power_switch"]["angle"], 14.0)
-    mv_usb = shift(out_usb[0] - CX, out_usb[1] - CY)
+    out_sw = bc.at(F["power_switch"]["angle"], 14.0)            # the switch plug drawn pulled out of its slot
     mv_sw = shift(out_sw[0] - CX, out_sw[1] - CY)
-    s = dict(show=state(10), move={"Index": lift(12.0), "Cord": shift(0, -16.0), "UsbPlug": mv_usb, "SwitchPlug": mv_sw},
+    s = dict(show=state(10), move={"Index": lift(12.0), "Cord": shift(0, -16.0), "SwitchPlug": mv_sw},
              anchors={}, view="iso", W=STEP_W, H=STEP_H)
-    s["show"].update(Index="teal", Cord="teal", UsbPlug="teal", SwitchPlug="teal")
-    s["anchors"]["usbplug_from"] = at(F["usb"]["angle"], bc.R_OUT + 14.0, 1.75)
-    s["anchors"]["usbplug_to"] = at(F["usb"]["angle"], bc.R_OUT + 0.8, 1.75)
+    s["show"].update(Index="teal", Cord="teal", SwitchPlug="teal")
     s["anchors"]["swplug_from"] = at(F["power_switch"]["angle"], bc.R_OUT + 13.0, 0.6)
     s["anchors"]["swplug_to"] = at(F["power_switch"]["angle"], bc.R_OUT + 0.2, 0.6)
     s["anchors"]["index_from"] = V(CX, CY + bc.INDEX_R, bc.Z_FACE - bc.INDEX_DEPTH + 12.0 - 0.4)
