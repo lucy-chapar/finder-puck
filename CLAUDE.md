@@ -13,7 +13,7 @@ vendored as `tools/kicad_helpers.py`; its own Digital Sand paths are unused or o
 - Generated, never edited by hand: the KiCad project files, `lib/finder_puck.*`, `fab/`, `mech/`, `docs/`, the case
   outputs in `case/` and the guide pictures in `manual/img/`. Change the scripts (`tools/`, `case/*.py`,
   `manual/*.py`, `regen.sh`) and regenerate. Hand-written: `README.md`, this file, the downloaded 3D models in
-  `lib/3dmodels/` and everything in `firmware/`.
+  `lib/3dmodels/`, the vendored logo path `case/oshw_logo.svg` and everything in `firmware/`.
 - `tools/generate_puck.py` (parts, nets, the FPC footprint) and `tools/puck_board.py` (placement, rule areas, fan-out
   vias, routing, feature export, fab files) build the board with KiCad 7's bundled Python:
   `FREEROUTING_JAR=/path/to/freerouting-1.9.0.jar /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3 tools/generate_puck.py`.
@@ -33,9 +33,15 @@ vendored as `tools/kicad_helpers.py`; its own Digital Sand paths are unused or o
   Expected: 0 errors and 1 warning (U4 SDO/SA0 on GND, which carries a power flag). Eeschema rewrites
   `finder_puck.kicad_pro` when it quits and leaves `.kicad_prl` and `.lck` files: restore the project file with
   `git checkout finder_puck.kicad_pro` afterwards.
-- Case: `case/build_case.py` (freecadcmd) builds shell, plate, ring, bezel, cap, the sliding USB-C door and the
-  TPU switch plug, plus the bolts, washers, inserts, index stub, flex antenna, seam seal, O-ring, door, crystal and lid
-  gaskets and interference proxies as reference solids, from `mech/`, and the 1:1 gasket template `case/finder_puck_gaskets.svg`. It must report 0 interferences, its `gap` lines (every printed-vs-other pair under
+- Case: `case/build_case.py` (freecadcmd) builds the machined aluminium shell (black anodised, tapped M2.5 holes,
+  V-grooved OSHW logo, cross-drilled lanyard hole) and the printed antenna window, plate, ring, bezel, cap, sliding
+  USB-C door and TPU switch plug, plus the bolts, washers, index stub, flex antenna, seam seal, window gasket,
+  O-ring, door, crystal and lid gaskets and interference proxies as reference solids, from `mech/`, the 1:1 gasket
+  template `case/finder_puck_gaskets.svg` and the 1:1 logo drawing `case/finder_puck_logo_vgroove.svg`. The shell
+  must stay machinable on a 3-axis mill (no undercuts, inside radii at least the cutter's), and no aluminium may
+  come between an antenna and the sky: the GPS looks up through the plastic plate, the LoRa flex sits on the
+  plastic window (the `rf:` lines give the clearances). It must report 0 interferences, its `gap` lines (every
+  made-vs-other pair under
   0.3 mm) must be designed seats only, its `squeeze` line (the switch plug's 0.1 mm press fit) non-zero, its `door open` lines
   free of overlap, and its `mesh`
   lines must say closed, 0 self-intersections. IP55 depends on every seal in README "Sealing (IP55)"; a change

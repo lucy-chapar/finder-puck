@@ -5,9 +5,9 @@ Studio renders of the finder puck in Blender 3.5 (Cycles on the Metal GPU).
     MESH_DIR=<dir> /opt/homebrew/bin/blender -b --python case/render_blender.py -- hero,pair,back [samples] [width]
 
 MESH_DIR holds the STLs written by export_meshes.py (default case/blender_mesh).  Views:
-  hero  one puck face up, searching (arrow and "38 m"), orange cord through the lanyard tunnel
+  hero  one puck face up, searching (arrow and "38 m"), orange cord through the lanyard hole
   pair  two pucks that have found each other: arrows point at one another and the bezels glow (beacon)
-  back  one puck turned over like a pancake, showing the debossed radar dial
+  back  one puck turned over like a pancake, showing the anodised back and the V-grooved OSHW logo
 Renders go to docs/finder_puck_render[_<view>].png; each scene is also saved as <MESH_DIR>/finder_puck_<view>.blend
 so it can be opened and tweaked by hand.  The screen graphics, cord and cord lock exist only here, not in the case model.
 Units: the assembly's mm scaled to metres, each puck centred on its own empty (12 o'clock = local +Y, button = -Y).
@@ -37,10 +37,12 @@ Z_BOTTOM = -9.7                            # shell underside
 Z_FACE = 8.6                               # plate face
 Z_SCREEN = 5.5                             # panel top; the crystal starts at 5.7
 R_ACTIVE = 32.4 / 2
-LANYARD_Y, LANYARD_Z = -35.3, -5.6         # chord bore along X (build_case.py LANYARD_R, LANYARD_Z)
-CORD_R = 1.0                               # 2 mm cord in the 2.8 mm bore
+R_OUT = 38.2                               # case radius
+LANYARD_R, LANYARD_Z = 35.3, -6.2          # at 6 o'clock: hole up from the back at r LANYARD_R, side hole at LANYARD_Z
+LOGO_R, VGROOVE_DEPTH = 11.5, 0.3          # the V-grooved logo on the back (build_case.py LOGO_W / 2, VGROOVE_DEPTH)
+CORD_R = 1.0                               # 2 mm cord in the 3 mm holes
 LOCK_R, LOCK_L = 3.0, 9.0                  # barrel cord lock
-PARTS = ["Shell", "Plate", "Ring", "Bezel", "Cap", "Index", "Crystal", "Panel", "Board",
+PARTS = ["Shell", "Window", "Plate", "Ring", "Bezel", "Cap", "Index", "Crystal", "Panel", "Board",
          "Bolt1", "Bolt2", "Bolt3", "Bolt4", "Door", "SwitchPlug", "CrystalGasket"]
 
 
@@ -150,6 +152,9 @@ def make_materials():
         "black": principled("MatteBlack", (0.016, 0.016, 0.017, 1), 0.62, specular=0.3, bump=(2200, 0.25, 0.00003)),
         "orange": principled("OrangePlastic", orange, 0.42, specular=0.45, coat=0.1),
         "anodised": principled("OrangeAnodised", (0.85, 0.22, 0.03, 1), 0.33, metallic=0.95, specular=0.6),
+        "black_anodised": principled("BlackAnodised", (0.022, 0.022, 0.024, 1), 0.38, metallic=0.85, specular=0.5,
+                                     bump=(3000, 0.15, 0.00002)),
+        "bare": principled("BareAluminium", (0.80, 0.80, 0.82, 1), 0.28, metallic=1.0, specular=0.6),
         "mask": principled("Soldermask", (0.02, 0.04, 0.03, 1), 0.45),
         "panel": principled("PanelBorder", (0.004, 0.005, 0.006, 1), 0.45, specular=0.3),
         "crystal": glass("MineralGlass", (1, 1, 1, 1), 0.0, 1.52),
@@ -229,7 +234,7 @@ def rotated(points, deg):
 # --- The puck ---------------------------------------------------------------
 def import_parts(M):
     """Import every STL once; pucks are built from copies that share the mesh data."""
-    mats = {"Shell": M["black"], "Plate": M["black"], "Ring": M["black"], "Cap": M["orange"], "Index": M["orange"],
+    mats = {"Shell": M["black_anodised"], "Window": M["black"], "Plate": M["black"], "Ring": M["black"], "Cap": M["orange"], "Index": M["orange"],
             "Bezel": M["resin"], "Crystal": M["crystal"], "Panel": M["panel"], "Board": M["mask"],
             "Door": M["black"], "SwitchPlug": M["black"], "CrystalGasket": M["black"]}
     parts = {}
@@ -245,9 +250,20 @@ def import_parts(M):
         bm.to_mesh(obj.data)
         bm.free()
         finish(obj, mats.get(name, M["anodised"]), smooth_angle=0 if name == "Board" else 35.0)
+        if name == "Shell":
+            bare_logo(obj, M)
         obj.location = -CENTRE * MM
         parts[name] = obj
     return parts
+
+
+def bare_logo(obj, M):
+    """The logo's V-groove cuts through the anodising: its walls show bare aluminium."""
+    obj.data.materials.append(M["bare"])
+    for p in obj.data.polygons:
+        c = p.center / MM - CENTRE
+        if (c.x ** 2 + c.y ** 2) ** 0.5 < LOGO_R + 0.5 and Z_BOTTOM + 0.01 < c.z < Z_BOTTOM + VGROOVE_DEPTH + 0.01:
+            p.material_index = 1
 
 
 def make_puck(name, parts, M, location=(0, 0, 0), rot_z=0.0, beacon=False):
@@ -310,9 +326,10 @@ def make_ui(root, M, bearing, text):
 
 
 def make_cord(root, M, world_dir):
-    """Orange cord through the lanyard tunnel: the two ends drape out of the mouths into a barrel lock on the floor
-    straight in front of the tunnel, and the loop then bends off along world_dir (world XY).  Works for a puck
-    lying face up or turned over (the root's rotation says which), as long as it rests flat on the floor."""
+    """Orange cord through the lanyard hole at 6 o'clock: one strand comes out of the side hole, the other out of the
+    hole in the back and round the edge; both run into a barrel lock on the floor straight in front, and the loop
+    then bends off along world_dir (world XY).  Works for a puck lying face up or turned over (the root's rotation
+    says which), as long as it rests flat on the floor.  The closing segment runs inside the puck, round the bend."""
     rot = root.rotation_euler.to_matrix()
     up = 1.0 if (rot @ Vector((0, 0, 1))).z > 0 else -1.0     # local +Z up (face up) or down (turned over)
     zf_surf = Z_BOTTOM if up > 0 else Z_FACE                   # the local Z that touches the floor
@@ -336,13 +353,17 @@ def make_cord(root, M, world_dir):
     tangents = [ahead] + [(loop[i + 1][0] - loop[i - 1][0]).normalized() for i in range(1, 3)] + [d]
     lz = LANYARD_Z
     mid = lz + 0.5 * (zf - lz)
-    right = [(9.0, LANYARD_Y, lz), (16.5, LANYARD_Y - 0.9, lz - up * 0.2), (21.0, -39.5, mid), (17.5, -47.0, zf),
-             (6.0, -52.0, zf), (1.0, lock.y + LOCK_L / 2 - 0.5, zl), (1.0, lock.y - LOCK_L / 2 + 0.5, zl)]
-    right += [side(c, t, off, zf) for (c, off), t in zip(loop, tangents)]
+    lock_pts = [(lock.y + LOCK_L / 2 - 0.5), (lock.y - LOCK_L / 2 + 0.5)]
+    right = [(0.0, -R_OUT + 1.5, lz), (0.3, -R_OUT - 2.5, lz), (1.5, -44.0, mid), (1.5, -50.0, zf)]
+    right += [(1.0, y, zl) for y in lock_pts] + [side(c, t, off, zf) for (c, off), t in zip(loop, tangents)]
+    if up > 0:      # face up: the back hole is on the floor side, so its strand runs out under the edge
+        back = [(0.0, -LANYARD_R, Z_BOTTOM + 1.5), (-0.3, -R_OUT + 0.5, zf), (-1.5, -44.0, zf), (-1.5, -50.0, zf)]
+    else:           # turned over: the back hole faces up and its strand goes over the edge and down
+        back = [(0.0, -LANYARD_R, Z_BOTTOM + 1.5), (0.0, -LANYARD_R - 0.3, Z_BOTTOM - 2.0),
+                (-0.6, -R_OUT - 1.0, Z_BOTTOM - 1.2), (-1.5, -43.0, mid), (-1.5, -50.0, zf)]
+    left = back + [(-1.0, y, zl) for y in lock_pts] + [side(c, t, -off, zf) for (c, off), t in zip(loop, tangents)]
     tip = c3 + 15.0 * d
-    left = [(-x, y, z) for x, y, z in right[:7]]
-    left += [side(c, t, -off, zf) for (c, off), t in zip(loop, tangents)]
-    pts = [(-9.0, LANYARD_Y, lz)] + right + [(tip.x, tip.y, zf)] + left[::-1][:-1]
+    pts = right + [(tip.x, tip.y, zf)] + left[::-1]
     cu = bpy.data.curves.new(root.name + "_Cord", "CURVE")
     cu.dimensions = "3D"
     cu.bevel_depth = CORD_R * MM
@@ -469,7 +490,7 @@ def view_back(scene, parts, M):
     puck.rotation_euler = (math.radians(180), 0, math.radians(166))
     puck.location = (0, 0, (Z_BOTTOM + Z_FACE) * MM)
     make_cord(puck, M, (1.0, -0.35))                         # off to the right
-    # A low light from behind left rakes across the underside so the deboss reads.
+    # A low light from behind left rakes across the underside so the V-groove's walls read.
     graze = bpy.data.lights.new("Graze", "AREA")
     graze.shape = "RECTANGLE"
     graze.size, graze.size_y = 0.5, 0.05

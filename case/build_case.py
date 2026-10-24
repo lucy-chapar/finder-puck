@@ -1,38 +1,45 @@
 """
-Printed case for the finder puck, built from the board's feature file.
+Case for the finder puck, built from the board's feature file.
 
-Five printed parts clamp together with four M2.5 screws that pass through the PCB:
+A machined aluminium shell and four printed parts clamp together with four M2.5 screws that pass through the PCB:
 
-  SHELL  (bottom, black)        battery bay, motor pocket, flex antenna on the wall, heat-set inserts,
-                                lanyard tunnel, USB-C / switch / lead notches, debossed
-                                radar dial and name on the underside
-  PLATE  (top, black)           bolt bosses with counterbored heads, covered sky window over
-                                the GPS patch, button bore, charge-LED pipe bore, orange index
-                                dot at 12 o'clock, pocket for the bezel flange and lid gasket
+  SHELL  (6061-T6, black anodised)  battery bay, motor pocket, tapped bolt bosses, cross-drilled lanyard hole,
+                                switch slot, the OSHW logo V-grooved into the back, and a notch from 12 to 3
+                                o'clock (the antenna window) where its wall is cut down to the floor
+  WINDOW (black)                the wall in that notch: plastic, so the LoRa flex antenna on its inside and the
+                                USB-C door in it are not behind metal.  Pegs into the shell's floor locate it
+  PLATE  (black)                bolt bosses with counterbored heads, covered sky window over the GPS patch,
+                                button bore, charge-LED pipe bore, orange index dot at 12 o'clock, pocket for
+                                the bezel flange and lid gasket.  Plastic: it is the GPS patch's radome
   RING   (black)                a short cup standing on the board: the panel's ledge.  Open
                                 at 6 o'clock for the panel chin and FPC, low over the ESP32
   BEZEL  (translucent)          sits on the ring: crystal seat, the visible lip, the flange
                                 the plate clamps, four light pipes down to the LEDs, a light
                                 pipe up from the charge LED, and the button bore's sleeve
   CAP    (orange)               the single button, sealed by an O-ring in the bezel's sleeve
-  DOOR   (black)                slides round the wall over the USB-C opening; its gasket seals on a land
+  DOOR   (black)                slides round the window over the USB-C opening; its gasket seals on a land
   SWITCH PLUG (TPU)             tethered cover for the switch slot
+
+Aluminium blocks radio.  The GPS patch looks up through the plastic plate and the LoRa antenna out through the
+plastic window, so every surface between an antenna and the sky is plastic; the build reports how close the
+aluminium comes to each.  The shell is drawn for a 3-axis mill in three setups (top, back, side): no undercuts,
+inside corners at least the radius of the tool that cuts them, the window's two ends 60 degree flanks.
 
 The ring and bezel used to be one part, but a panel cannot be fitted into a cup that has a
 ledge below it and a lip above it, so the stack is now: ring, panel, gasket, crystal, bezel.
 
-Sealed to IP55 (dust protected, water jets): a closed-cell foam seal compressed between the shell's
-rim and the plate's skirt, nylon washers under the bolt heads, an O-ring on the button cap, the USB-C
-door's gasket, the switch plug, and die-cut foam gaskets under the bezel's lip (on the crystal) and on its flange
-(under the plate).  Nothing is glued: the lid comes off with the four bolts.  Every path in ends at one of those
-(see "Sealing (IP55)" in the README).
+Sealed to IP55 (dust protected, water jets): a closed-cell foam seal compressed between the rim of the shell and
+window and the plate's skirt, a foam strip under the window (on the shell's flanks and the notch floor), nylon
+washers under the bolt heads, an O-ring on the button cap, the USB-C door's gasket, the switch plug, and die-cut
+foam gaskets under the bezel's lip (on the crystal) and on its flange (under the plate).  Nothing is glued: the lid
+comes off with the four bolts.  Every path in ends at one of those (see "Sealing (IP55)" in the README).
 
-Modelled hardware (not printed): four M2.5 x 12 socket caps, their nylon washers, four inserts, the
-orange index stub, the panel, crystal, battery, motor, the flex antenna, the seam seal, the
+Modelled hardware (not made): four M2.5 x 12 socket caps and their nylon washers, the
+orange index stub, the panel, crystal, battery, motor, the flex antenna, the seam seal, the window gasket, the
 button's O-ring and the door, crystal and lid gaskets (all drawn compressed).  Proxies (not in the board model
 either) for the mated battery plug, the three cables through the board notch, the FPC fold, the
-USB plug's overmold and the GPS module at its tolerance limits.  Every printed part is checked
-for interference against all of these, and every printed-vs-other pair closer than REPORT_GAP is
+USB plug's overmold and the GPS module at its tolerance limits.  Every made part is checked
+for interference against all of these, and every made-vs-other pair closer than REPORT_GAP is
 listed with its nearest point.
 
 Run with FreeCAD's console after regenerating the board:
@@ -43,10 +50,10 @@ Coordinates: X = board x, Y = -board y (KiCad's Y points down), Z = 0 at the PCB
 Angles are degrees, 0 at 3 o'clock, counter-clockwise on the face (90 = 12 o'clock).
 """
 
-import glob
 import json
 import math
 import os
+import re
 import sys
 
 import FreeCAD
@@ -95,36 +102,45 @@ def fp_dir(ref, lx, ly):
 
 # --- Parameters (mm) --------------------------------------------------------
 GAP = 0.4                        # board edge to wall
-WALL = 1.8                       # leaves a 0.8 mm plate skirt over the lap lip
+WALL = 1.8
 R_IN = R_BOARD + GAP             # 36.4
 R_OUT = R_IN + WALL              # 38.2 -> 76.4 mm across
-FLOOR = 1.8                      # thick enough for the 0.4 mm deboss and the 0.6 mm pockets
+FLOOR = 1.8                      # leaves 1.5 mm under the 0.3 mm logo groove and 1.2 mm under the motor pocket
 BAY = 6.3                        # 5.3 mm cell on 0.5 mm foam, 0.5 mm air above it
 Z_FLOOR = -T_BOARD - BAY         # -7.9
 Z_BOTTOM = Z_FLOOR - FLOOR       # -9.7
 Z_SPLIT = 3.0                    # parting line
-LEDGE_W = 2.0                    # board rests on this rim; its underside is a 45 degree chamfer
-# Shell-to-plate joint.  The lap lip stands inboard of the wall (its 45 degree underside overhangs the
-# inside) so the plate skirt and the seal under it get 1.5 mm of the wall's top.
-R_LAP0, R_LAP1 = 35.8, 36.45     # lap lip, 0.3 mm outside the plate bosses (r 35.5)
-LIP_T, LIP_H, LAP_GAP = R_LAP1 - R_LAP0, 1.5, 0.25   # 0.65 thick, 1.5 tall, 0.25 radial play to the skirt
-R_SKIRT_IN = R_LAP1 + LAP_GAP    # 36.7: plate skirt 1.5 wide over the seal
-SEAL_T, SEAL_INSET = 1.0, 0.05   # closed-cell foam seal on the shell rim, 1.0 mm thick ...
+LEDGE_W = 2.0                    # the board rests on a 2 mm step: the bay below it is a smaller bore (no undercut)
+R_BAY = R_IN - LEDGE_W           # 34.4
+BOTTOM_R = 1.0                   # outer edge of the back, a corner-rounding cutter
+# Shell-to-plate joint: the plate's skirt covers the whole rim (and the window's top); no lap lip, which would be
+# an undercut in the aluminium.
+SEAL_T, SEAL_INSET = 1.0, 0.05   # closed-cell foam seal on the rim, 1.0 mm thick ...
 PLATE_GAP = 0.6                  # ... squeezed to the rim gap (40 %): the bosses are still the datum, not the rim
+# Antenna window: between WINDOW (angles at the notch floor) the shell's wall is cut down to the floor, with
+# FLANK degree flanks at the two ends (so the bolts' clamp squeezes the foam strip on them), and a plastic wall
+# part fills it, SEAL_GAP clear of the shell all round.  It stands on two feet with pegs in the shell's floor.
+WINDOW = (-14.0, 81.0)           # 3 to 12 o'clock: the USB-C door's pocket, the antenna, a few mm margin.  The
+                                 # bolt boss at -45 stays whole: a flank through it could not be cut with one pass
+FLANK = 60.0
+SEAL_GAP = PLATE_GAP             # the window gasket (1.0 mm foam strip) squeezed to 0.6 mm, normal to each face
+WINDOW_FEET = (-6.0, 77.0)       # feet on the floor inside the wall: angle; radial extent, width, height
+FOOT_R0, FOOT_W, FOOT_H = 34.0, 4.0, 1.5
+PEG_D, PEG_L, PEG_R = 2.0, 1.0, 35.2   # pegs under the feet, in 2.1 x 1.2 mm holes drilled in the floor
 Z_FACE = 8.6                     # 0.6 mm over the board's 8.0, so every lid seal is a clamped gasket
 SKIN = 1.6
 Z_SKIN = Z_FACE - SKIN           # 7.0
-# Bolts: M2.5 x 12 socket caps (anodised aluminium, head 4.5 x 2.5) through the PCB into inserts.
-BOSS_R = BOLTS["boss_r"]         # 3.75
+# Bolts: M2.5 x 12 socket caps (anodised aluminium, head 4.5 x 2.5) through the PCB into threads tapped in the shell.
+BOSS_R = BOLTS["boss_r"]         # 3.75 (the plate's bosses)
+SHELL_BOSS_R = 3.25              # the shell's: 0.55 mm round the board's 5.4 mm pad, 1.4 mm from the antenna
+BOSS_FILLET = 1.5                # where they run into the bay's wall: a 3 mm cutter
 BOLT_CLEAR = 3.0
 HEAD_D, HEAD_H, HEAD_PROUD = 4.5, 2.5, 0.2
 BOLT_D, BOLT_L = 2.5, 12.0
 SOCKET_AF, SOCKET_DEPTH = 2.0, 1.2
 CBORE_D = 5.2
 WASHER_D, WASHER_ID, WASHER_T = 5.0, 2.7, 0.5   # DIN 433 M2.5 nylon washer under each head: seals the bolt bore
-INSERT_D, INSERT_DEPTH = 4.2, 6.4   # hole for a Ruthex RX-M2.5x5.7, includes 0.2 mm FDM shrink
-INSERT_SINK_D, INSERT_SINK = 4.6, 0.3    # room for the melt the insert pushes up
-INSERT_OD, INSERT_L = 3.5, 5.7
+TAP_DEPTH, TAP_DRILL, DRILL_DEPTH, TAP_SINK = 5.0, 2.05, 6.0, 0.3   # M2.5 thread (modelled at 2.5), drill, countersink
 # Display stack.
 LEDGE_Z = PANEL["ledge_z"]       # panel underside, 4.0
 PANEL_T = PANEL["thickness"]     # 1.5
@@ -173,10 +189,11 @@ GPS_WIN_R = 2.0                  # keeps the window inside the plate wall; 1 mm 
 INDEX_R, INDEX_D, INDEX_DEPTH = 34.7, 1.8, 0.6   # 12 o'clock mark: a glued 1.75 mm orange filament stub in a blind hole
 USB_W, USB_Z0, USB_Z1 = 13.5, -1.8, 5.2      # 12.35 x 6.5 plug overmold, centred on the receptacle axis (Z 1.65-1.78)
 SWITCH_W, SWITCH_Z0, SWITCH_Z1 = 7.0, -0.5, 1.8   # knob at Z 0.45-1.25: the slot stays in the shell, under the seal
-SCALLOP_W, SCALLOP_D = 10.0, 1.0            # finger scallop outside the switch slot: the knob sits 0.7 mm in
+SWITCH_RC = 1.0                              # its corners: a 2 mm cutter from the side
+SCALLOP_W, SCALLOP_D, SCALLOP_RC = 10.0, 1.0, 2.0   # finger scallop outside the switch slot: the knob sits 0.7 mm in
 SCALLOP_Z0, SCALLOP_Z1 = -4.0, 2.6          # below the rim, so the seal runs past it unbroken
-# USB-C door: a curved door that slides round the wall in a pocket, held by tongues in two grooves (the
-# lower one in the shell, the upper one in the plate, so the door is captive once the plate is on).  A
+# USB-C door: a curved door that slides round the window in a pocket, held by tongues in two grooves (the
+# lower one in the window, the upper one in the plate, so the door is captive once the plate is on).  A
 # die-cut 0.5 mm foam gasket on its inside rides 0.05 mm clear of the pocket floor, and in the closed
 # position lands on a raised frame round the opening (two-step lead-in at its ends) and is squeezed 0.2 mm.
 DOOR_FLOOR = 37.1                # pocket floor radius; the seam seal runs out to it here
@@ -188,7 +205,7 @@ DOOR_EDGE = 0.4                  # door beyond the land on each side
 DOOR_TONGUE = (37.2, 0.35)       # door tongues: inner radius, height into the grooves
 DOOR_GROOVE = (DOOR_FLOOR, 37.75, 0.45)   # grooves: r0, r1, height
 DOOR_CLEAR = 0.05                # door to pocket and groove faces
-DOOR_TRAVEL = 24.5               # degrees from closed to open, clockwise (towards 4 o'clock)
+DOOR_TRAVEL = 24.5               # degrees from closed to open, counter-clockwise (towards 2 o'clock)
 DOOR_GRIP = (0.3, 3)             # grip ribs on the outside: height, count
 # TPU plug (85A-95A) for the switch slot: a body pressed into the slot (PLUG_SQUEEZE oversize per side), a
 # flange on the scallop floor, and a strap to a pin glued into a blind hole in the shell.
@@ -199,13 +216,18 @@ PLUG_PIN_D, PLUG_PIN_L = 1.6, 1.0
 SW_PLUG_IN = 36.6                            # body's inner face, 0.14 mm from the knob (r 36.46)
 SW_PIN_Z = -2.9
 BATT_NOTCH = F["notches"][0]                 # (angle, width, depth): the board is notched; the wall gets a shallow groove
-LANYARD_R, LANYARD_BORE, LANYARD_Z = 35.3, 2.8, -5.6   # 0.6 mm roof under the block top
-LANYARD_BLOCK = (32.5, 244, 296)             # inner radius, start, end angle
-LANYARD_MOUTH = 0.5                          # fillet on the two bore mouths (the bore leaves the wall at 16 degrees)
+# Lanyard: two 3 mm holes drilled square to the surface, one up from the back and one in from the side at
+# 6 o'clock, meeting in a boss inside the wall; the cord goes in at the side and out at the back.  The back hole
+# stops LANYARD_REACH above the side hole's axis, so its drill point stays 0.7 mm under the boss's top.
+LANYARD_ANGLE, LANYARD_R, LANYARD_D, LANYARD_Z = 270.0, 35.3, 3.0, -6.2   # vertical hole's radius; side hole's Z
+LANYARD_BOSS, LANYARD_TOP = 3.2, -3.6        # boss radius (about the vertical hole) and top, 2 mm under the board
+LANYARD_SINK = 0.4                           # 45 degree countersink on both mouths
+LANYARD_REACH = 1.0
+DRILL_TIP = 0.5 / math.tan(math.radians(59)) # 118 degree point, per mm of diameter
 MOTOR_POCKET = F["motor"]["pocket"]
-# 915 MHz adhesive flex antenna (48 x 7 mm class) stuck to the inside of the wall, just outside
-# the board's edge: perpendicular to the ground plane instead of lying under it.
-FLEX_ARC, FLEX_Z, FLEX_T = (15, 90), (-7.2, -0.2), 0.2
+# 915 MHz adhesive flex antenna (2J 2JF0515P, 39.9 x 7 mm) stuck to the inside of the plastic window, just outside
+# the board's edge: perpendicular to the ground plane instead of lying under it, and 2.5 mm above the aluminium floor.
+FLEX_ARC, FLEX_Z, FLEX_T = (14, 77), (-5.4, 1.6), 0.2
 BUTTON = F["button"]
 CAP_D, CAP_BORE, CAP_PROUD, CAP_FLANGE_D = 10.0, 10.6, 1.5, 12.4
 CAP_SOCKET, CAP_SOCKET_DEPTH = 3.7, 1.0     # pocket for the PTS645 stem
@@ -218,9 +240,11 @@ ORING_CS = 1.0
 LED_PIPE_D, LED_PIPE_BORE = 1.2, 1.4         # pipe, its bore in the skin
 LED_FOOT_D, LED_FOOT_Z0 = 1.6, 1.45          # thicker below the flange, 0.3 mm over the LED (top at 1.15)
 LED_TAB_W, LED_TAB_R = 4.0, 2.3              # tab width, round end about the pipe
-# Underside deboss.
-DEBOSS_ART, DEBOSS_TEXT = 0.3, 0.4
-TEXT_H = 3.5                                 # cap height; DejaVu Bold gives a 0.6 mm stroke
+# The back carries only the Open Source Hardware logo, engraved as a line: a 90 degree V-bit runs along its outline
+# (a contour, not a pocket) at VGROOVE_DEPTH, so the groove is twice that wide.  It cuts through the anodising and
+# shows bare aluminium.
+LOGO_SVG = os.path.join(CASE, "oshw_logo.svg")
+LOGO_W, VGROOVE_DEPTH, VGROOVE_OVER = 22.0, 0.3, 0.1   # the last: the model's walls run on past the surface
 # Proxies for what the board model does not contain.
 PH_PLUG, PH_MOUTH, PH_PLUG_OUT = (6.85, 5.8, 4.5), 4.4, 2.0   # PHR-2 housing (length, width, height); J2's mouth is 4.4 mm
                                              # along its +Y; the mated housing stands this far out of the mouth
@@ -233,18 +257,8 @@ REPORT_GAP = 0.3                             # list every printed-vs-other pair 
 # Designed overlaps: the switch plug's body is PLUG_SQUEEZE oversize in its slot.  Listed as a "squeeze" line,
 # not an interference; anything else that overlaps is.
 SQUEEZE = {frozenset(("SwitchPlug", "Shell"))}
+ALUMINIUM = ("Shell",)
 EXCLUSIVE = {frozenset(("Door", "ProxyUSB")), frozenset(("DoorGasket", "ProxyUSB"))}   # the door is open whenever a cable is in
-
-
-def font_file():
-    """The guide's font, vendored under manual/; FreeCAD's own DejaVu as a fallback."""
-    mine = os.path.join(PUCK, "manual", "assets", "fonts", "DejaVuSans-Bold.ttf")
-    if os.path.exists(mine):
-        return mine
-    res = os.path.dirname(FreeCAD.getResourceDir().rstrip("/"))      # .../Resources
-    hits = glob.glob(os.path.join(res, "lib", "python3*", "site-packages", "matplotlib", "mpl-data", "fonts", "ttf",
-                                  "DejaVuSans-Bold.ttf"))
-    return hits[0] if hits else os.path.join(res, "fonts", "DejaVuSans.ttf")
 
 
 # --- Solid helpers ---------------------------------------------------------
@@ -284,9 +298,13 @@ def radial_box(angle, r0, r1, width, z0, z1):
     return b
 
 
-def local_box(angle, x0, x1, y0, y1, z0, z1):
-    """Box in the frame of a radial direction: x outward along angle, y counter-clockwise across it."""
+def local_box(angle, x0, x1, y0, y1, z0, z1, rc=0.0):
+    """Box in the frame of a radial direction: x outward along angle, y counter-clockwise across it.  rc rounds the
+    four edges that run along x: the corners a cutter coming in from the side leaves."""
     b = Part.makeBox(x1 - x0, y1 - y0, z1 - z0, V(x0, y0, z0))
+    if rc > 0.01:
+        b = b.makeFillet(min(rc, (y1 - y0) / 2 - 0.01, (z1 - z0) / 2 - 0.01),
+                         [e for e in b.Edges if abs(e.tangentAt(e.FirstParameter).x) > 0.99])
     b.rotate(V(0, 0, 0), V(0, 0, 1), angle)
     b.translate(V(CX, CY, 0))
     return b
@@ -327,30 +345,23 @@ def hex_prism(af, z0, z1, x, y):
     return Part.Face(Part.makePolygon(pts)).extrude(V(0, 0, z1 - z0))
 
 
-def text_solid(text, height, depth, x, y, font):
-    """Debossed text as a solid (letters extruded by depth, z from 0), centred on (x, y) in the XY plane."""
-    glyphs = Part.makeWireString(text, font, height, 0.0)
-    faces = []
-    for wires in glyphs:
-        if not wires:                       # a space
-            continue
-        wires = sorted(wires, key=lambda w: -Part.Face(w).Area)
-        try:
-            faces.append(Part.Face(wires))
-        except Exception:
-            faces.append(Part.Face(wires[0]))
-    shape = Part.makeCompound(faces)
-    bb = shape.BoundBox
-    shape.translate(V(x - (bb.XMin + bb.XMax) / 2, y - (bb.YMin + bb.YMax) / 2, 0))
-    return Part.makeCompound([f.extrude(V(0, 0, depth)) for f in shape.Faces])
-
-
 def largest_solid(shape):
     return max(shape.Solids, key=lambda s: s.Volume)
 
 
+def round_outer(shape, r, z):
+    """Round the circular outer edge of the shell's back (a corner-rounding cutter)."""
+    edges = [e for e in shape.Edges if abs(e.BoundBox.ZMin - z) < 1e-3 and abs(e.BoundBox.ZMax - z) < 1e-3
+             and e.BoundBox.XLength > 2 * R_OUT - 0.5]
+    try:
+        return shape.makeFillet(r, edges)
+    except Exception:
+        print("outer edge: NOT rounded  <-- CHECK")
+        return shape
+
+
 def chamfer_outer(shape, size, z):
-    """Chamfer the circular outer edge of a shell at height z: these edges print on the bed, where a
+    """Chamfer the circular outer edge of a printed part at height z: these edges print on the bed, where a
     fillet would start as an unsupported 90 degree overhang (best effort)."""
     try:
         edges = [e for e in shape.Edges if abs(e.BoundBox.ZMin - z) < 1e-3 and abs(e.BoundBox.ZMax - z) < 1e-3
@@ -362,124 +373,368 @@ def chamfer_outer(shape, size, z):
     return shape
 
 
-def lanyard_mouths(body):
-    """Fillet the two bore mouths.  The chord bore leaves the round wall at a grazing angle (16 degrees on
-    the outer side), so without this each mouth is a knife edge that would saw the cord.  OCC's fillet is
-    fragile on such edges: a result is accepted only if it is valid, adds nothing, removes a plausible
-    volume and the feather sliver is gone."""
-    edges = [e for e in body.Edges
-             if abs(e.BoundBox.ZMin - LANYARD_Z) < LANYARD_BORE and abs(e.BoundBox.ZMax - LANYARD_Z) < LANYARD_BORE
-             and all(abs(math.hypot(p.x - CX, p.y - CY) - R_OUT) < 0.02 for p in e.discretize(12))]
-    y_gen = LANYARD_R + LANYARD_BORE / 2                             # the bore's outermost line, 36.7 from the axis
-    x_probe = math.sqrt(R_OUT ** 2 - y_gen ** 2) - 0.6                # 0.6 mm in from the knife edge ...
-    y_probe = (y_gen + math.sqrt(R_OUT ** 2 - x_probe ** 2)) / 2      # ... halfway through the sliver there
-    probes = [V(CX + s * x_probe, CY - y_probe, LANYARD_Z) for s in (1, -1)]
-    if len(edges) != 2 or not all(body.isInside(p, 1e-6, True) for p in probes):
-        print("lanyard mouths: unexpected geometry (%d edges), not filleted  <-- CHECK" % len(edges))
-        return body
-    for r in (LANYARD_MOUTH, LANYARD_MOUTH - 0.05, LANYARD_MOUTH + 0.1, LANYARD_MOUTH - 0.2):
-        try:
-            f = body.makeFillet(r, edges)
-            if (f.isValid() and f.cut(body).Volume < 0.01 and 0 < body.cut(f).Volume < 100
-                    and not any(f.isInside(p, 1e-6, True) for p in probes)):
-                print("lanyard mouths: %.2f mm fillet" % r)
-                return f
-        except Exception:
-            pass
-    print("lanyard mouths: NOT filleted (OCC refused every radius)  <-- CHECK")
-    return body
+def drill(base, axis, d, depth, tip=True):
+    """A drilled hole from base along axis (unit vector), d across and depth deep to the full diameter, with a
+    118 degree point beyond that."""
+    h = Part.makeCylinder(d / 2, depth, base, axis)
+    if tip:
+        h = h.fuse(Part.makeCone(d / 2, 0, d * DRILL_TIP, base + axis * depth, axis))
+    return h
+
+
+def countersink(mouth, axis, d, sink):
+    """45 degree countersink at a hole's mouth: axis points into the part; starts 1 mm outside the surface."""
+    return Part.makeCone(d / 2 + sink + 1.0, d / 2, sink + 1.0, mouth - axis * 1.0, axis)
+
+
+# --- SVG logo ---------------------------------------------------------------
+
+def svg_path_points(d, step=0.05):
+    """Flatten an SVG path (M L H V C S Q A Z, absolute or relative) to closed polylines."""
+    toks = re.findall(r"[MmLlHhVvCcSsQqAaZz]|[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?", d)
+    polys, cur = [], []
+    st = {"i": 0}
+    x = y = sx = sy = 0.0
+    cmd, last_ctrl = None, None
+
+    def num():
+        st["i"] += 1
+        return float(toks[st["i"] - 1])
+
+    def cubic(p0, p1, p2, p3):
+        n = max(4, int(math.dist(p0, p3) / step) + 4)
+        for k in range(1, n + 1):
+            t = k / n
+            u = 1 - t
+            cur.append((u ** 3 * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t ** 3 * p3[0],
+                        u ** 3 * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t ** 3 * p3[1]))
+
+    def arc_to(p0, rx, ry, phi, fa, fs, p1):
+        """SVG elliptical arc, by the endpoint-to-centre conversion of the SVG spec (F.6.5)."""
+        rx, ry = abs(rx), abs(ry)
+        if rx == 0 or ry == 0:
+            cur.append(p1)
+            return
+        c, s = math.cos(math.radians(phi)), math.sin(math.radians(phi))
+        dx, dy = (p0[0] - p1[0]) / 2, (p0[1] - p1[1]) / 2
+        x1, y1 = c * dx + s * dy, -s * dx + c * dy
+        lam = x1 * x1 / (rx * rx) + y1 * y1 / (ry * ry)
+        if lam > 1:
+            rx, ry = rx * math.sqrt(lam), ry * math.sqrt(lam)
+        k = math.sqrt(max(0.0, (rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1) /
+                          (rx * rx * y1 * y1 + ry * ry * x1 * x1)))
+        k = -k if fa == fs else k
+        cx1, cy1 = k * rx * y1 / ry, -k * ry * x1 / rx
+        cx, cy = c * cx1 - s * cy1 + (p0[0] + p1[0]) / 2, s * cx1 + c * cy1 + (p0[1] + p1[1]) / 2
+        a0 = math.atan2((y1 - cy1) / ry, (x1 - cx1) / rx)
+        da = math.atan2((-y1 - cy1) / ry, (-x1 - cx1) / rx) - a0
+        if fs and da < 0:
+            da += 2 * math.pi
+        if not fs and da > 0:
+            da -= 2 * math.pi
+        n = max(3, int(abs(da) * max(rx, ry) / step) + 3)
+        for j in range(1, n + 1):
+            a = a0 + da * j / n
+            cur.append((cx + c * rx * math.cos(a) - s * ry * math.sin(a), cy + s * rx * math.cos(a) + c * ry * math.sin(a)))
+        cur[-1] = p1
+
+    while st["i"] < len(toks):
+        if toks[st["i"]].isalpha():
+            cmd = toks[st["i"]]
+            st["i"] += 1
+            if cmd in "Zz":
+                if cur:
+                    polys.append(cur)
+                cur, (x, y), last_ctrl = [], (sx, sy), None
+                continue
+        rel, C = cmd.islower(), cmd.upper()
+        ox, oy = (x, y) if rel else (0.0, 0.0)
+        if C == "M":
+            if cur:
+                polys.append(cur)
+            x, y = ox + num(), oy + num()
+            sx, sy, cur, cmd, last_ctrl = x, y, [(x, y)], ("l" if rel else "L"), None
+        elif C == "L":
+            x, y = ox + num(), oy + num()
+            cur.append((x, y))
+            last_ctrl = None
+        elif C == "H":
+            x = (x if rel else 0.0) + num()
+            cur.append((x, y))
+            last_ctrl = None
+        elif C == "V":
+            y = (y if rel else 0.0) + num()
+            cur.append((x, y))
+            last_ctrl = None
+        elif C in "CS":
+            p1 = (2 * x - last_ctrl[0], 2 * y - last_ctrl[1]) if C == "S" and last_ctrl else (
+                (x, y) if C == "S" else (ox + num(), oy + num()))
+            p2, p3 = (ox + num(), oy + num()), None
+            p3 = (ox + num(), oy + num())
+            cubic((x, y), p1, p2, p3)
+            (x, y), last_ctrl = p3, p2
+        elif C == "Q":
+            q, p3 = (ox + num(), oy + num()), None
+            p3 = (ox + num(), oy + num())
+            cubic((x, y), ((x + 2 * q[0]) / 3, (y + 2 * q[1]) / 3), ((p3[0] + 2 * q[0]) / 3, (p3[1] + 2 * q[1]) / 3), p3)
+            (x, y), last_ctrl = p3, None
+        elif C == "A":
+            rx, ry, phi = num(), num(), num()
+            fa, fs = int(num()), int(num())
+            p1 = (ox + num(), oy + num())
+            arc_to((x, y), rx, ry, phi, fa, fs, p1)
+            (x, y), last_ctrl = p1, None
+    if cur:
+        polys.append(cur)
+    return polys
+
+
+def _douglas_peucker(pts, tol):
+    a, b = pts[0], pts[-1]
+    length = math.dist(a, b) or 1e-12
+    dmax, k = 0.0, 0
+    for i in range(1, len(pts) - 1):
+        p = pts[i]
+        d = abs((b[0] - a[0]) * (a[1] - p[1]) - (a[0] - p[0]) * (b[1] - a[1])) / length
+        if d > dmax:
+            dmax, k = d, i
+    if dmax <= tol:
+        return [a, b]
+    return _douglas_peucker(pts[:k + 1], tol)[:-1] + _douglas_peucker(pts[k:], tol)
+
+
+def _inset(poly, d):
+    """Mitred inward offset of a counter-clockwise polygon, vertex for vertex."""
+    out = []
+    for i in range(len(poly)):
+        a, b, c = poly[i - 1], poly[i], poly[(i + 1) % len(poly)]
+        l1, l2 = math.dist(a, b), math.dist(b, c)
+        n1 = (-(b[1] - a[1]) / l1, (b[0] - a[0]) / l1)
+        n2 = (-(c[1] - b[1]) / l2, (c[0] - b[0]) / l2)
+        k = 1 + n1[0] * n2[0] + n1[1] * n2[1]
+        out.append((b[0] + d * (n1[0] + n2[0]) / k, b[1] + d * (n1[1] + n2[1]) / k))
+    return out
+
+
+def _corner(a, b, c, d):
+    """Where line a-b meets line c-d (the midpoint of b and c if they are near parallel)."""
+    r, q = (b[0] - a[0], b[1] - a[1]), (d[0] - c[0], d[1] - c[1])
+    den = r[0] * q[1] - r[1] * q[0]
+    if abs(den) < 1e-9 * math.hypot(*r) * math.hypot(*q):
+        return ((b[0] + c[0]) / 2, (b[1] + c[1]) / 2)
+    t = ((c[0] - a[0]) * q[1] - (c[1] - a[1]) * q[0]) / den
+    return (a[0] + t * r[0], a[1] + t * r[1])
+
+
+def logo_outline():
+    """The OSHW logo as one counter-clockwise polygon in case XY about (0, 0), LOGO_W across, as seen from the back
+    (mirrored in X, keyhole towards 6 o'clock), simplified to 0.02 mm: the V-bit's path.  The source rounds its
+    corners with arcs far smaller than the groove; those become sharp corners (an edge whose offset by the groove's
+    half width would turn round is replaced by the meeting point of its neighbours)."""
+    d = re.search(r'\sd="([^"]+)"', open(LOGO_SVG).read()).group(1)
+    raw = max(svg_path_points(d), key=len)
+    xs, ys = [p[0] for p in raw], [p[1] for p in raw]
+    s, mx, my = LOGO_W / (max(xs) - min(xs)), (max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2
+    poly = [(-(px - mx) * s, -(py - my) * s) for px, py in raw]
+    if math.dist(poly[0], poly[-1]) < 1e-2:
+        poly = poly[:-1]
+    i = max(range(len(poly)), key=lambda j: poly[j][0])
+    poly = poly[i:] + poly[:i]
+    k = max(range(len(poly)), key=lambda j: math.dist(poly[0], poly[j]))
+    ring = _douglas_peucker(poly[:k + 1], 0.02)[:-1] + _douglas_peucker(poly[k:] + [poly[0]], 0.02)[:-1]
+    poly = []
+    for p in ring:
+        if not poly or math.dist(poly[-1], p) > 1e-4:
+            poly.append(p)
+    if sum(poly[i - 1][0] * poly[i][1] - poly[i][0] * poly[i - 1][1] for i in range(len(poly))) < 0:
+        poly.reverse()
+    r = VGROOVE_DEPTH + VGROOVE_OVER
+    while True:
+        n = len(poly)
+        flipped = [i for o in (_inset(poly, r), _inset(poly, -r)) for i in range(n) if
+                   (poly[(i + 1) % n][0] - poly[i][0]) * (o[(i + 1) % n][0] - o[i][0]) +
+                   (poly[(i + 1) % n][1] - poly[i][1]) * (o[(i + 1) % n][1] - o[i][1]) <=
+                   0.25 * math.dist(poly[i], poly[(i + 1) % n]) * math.dist(o[i], o[(i + 1) % n])]
+        if not flipped:
+            return poly
+        i = flipped[0]
+        j = (i + 1) % n
+        c = _corner(poly[i - 1], poly[i], poly[j], poly[(j + 1) % n])
+        poly[i] = c
+        del poly[j]
+
+
+def oshw_vgroove():
+    """The engraved logo as a solid to cut from the back: a 90 degree V-bit's groove with its tip VGROOVE_DEPTH deep on
+    the outline, its walls carried VGROOVE_OVER past the surface.  Planar faces: each wall is the outline offset by the
+    groove's half width at the top, ruled down to the outline at the tip (sharp corners, where a real bit rounds the
+    groove's outer edge by its half width)."""
+    poly = logo_outline()
+    r = VGROOVE_DEPTH + VGROOVE_OVER
+    z_tip, z_top = Z_BOTTOM + VGROOVE_DEPTH, Z_BOTTOM - VGROOVE_OVER
+    def ring(pts, z):
+        return [V(CX + x, CY + y, z) for x, y in pts]
+    tip, out, inn = ring(poly, z_tip), ring(_inset(poly, -r), z_top), ring(_inset(poly, r), z_top)
+    faces = []
+    for i in range(len(poly)):
+        j = (i + 1) % len(poly)
+        faces.append(Part.Face(Part.makePolygon([out[i], out[j], tip[j], tip[i], out[i]])))
+        faces.append(Part.Face(Part.makePolygon([inn[i], tip[i], tip[j], inn[j], inn[i]])))
+    faces.append(Part.Face(Part.makePolygon(out + out[:1])).cut(Part.Face(Part.makePolygon(inn + inn[:1]))).Faces[0])
+    shell = Part.Shell(faces)
+    shell.sewShape()
+    groove = Part.Solid(shell)
+    if groove.Volume < 0:
+        groove.reverse()
+    return groove
+
+
+def write_logo_template(path):
+    """1:1 SVG of the logo's engraving path, seen from the back, for the machinist."""
+    poly = logo_outline()
+    m = 6.0
+    w = LOGO_W + 2 * m
+    def d(p):
+        return "M " + " L ".join("%.3f %.3f" % (x + w / 2, -y + w / 2 + 6) for x, y in p) + " Z"
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" width="%.1fmm" height="%.1fmm" viewBox="0 0 %.1f %.1f">' % (
+        w + 40, w + 14, w + 40, w + 14),
+        '<text x="2" y="4" font-family="sans-serif" font-size="2.5">Finder Puck back: OSHW logo, 1:1, seen from the '
+        "back, centred on the case axis, 12 o'clock up</text>",
+        '<text x="2" y="%.1f" font-family="sans-serif" font-size="2.2">V-groove (contour, not pocket): 90 deg V-bit, tip '
+        'on the black line, %.2f mm deep, so %.2f mm wide (grey). Engrave after anodising.</text>' % (
+            w + 11, VGROOVE_DEPTH, 2 * VGROOVE_DEPTH),
+        '<path d="%s" fill="none" stroke="#bbb" stroke-width="%.2f" stroke-linejoin="round"/>' % (
+            d(poly), 2 * VGROOVE_DEPTH),
+        '<path d="%s" fill="none" stroke="black" stroke-width="0.05"/>' % d(poly),
+        '<path d="M %.1f %.1f h 10" stroke="black" stroke-width="0.2"/><text x="%.1f" y="%.1f" font-family="sans-serif" '
+        'font-size="2.2">10 mm</text>' % (w + 4, w / 2 + 6, w + 15, w / 2 + 6.8),
+        "</svg>"]
+    with open(path, "w") as f:
+        f.write("\n".join(out) + "\n")
+
+
+# --- Antenna window ---------------------------------------------------------
+
+def _flank_side(end, grow):
+    """Half-space on the window's side of one of its flanks (end 0: the clockwise end, 1: the counter-clockwise
+    end), moved grow mm away from the window along the flank's normal (negative: into the window).  The flank is a
+    plane through the radial line at the window's floor corner, leaning FLANK degrees from the horizontal, so a
+    cutter on a radial axis machines it and the plate's clamp squeezes the strip on it."""
+    sgn = 1 if end else -1                                   # the window lies on -sgn*y of this end's frame
+    tilt = -sgn * (90.0 - FLANK)
+    b = Part.makeBox(200, 200, 120, V(-100, -200 if end else 0, Z_FLOOR - 60))
+    b.rotate(V(0, 0, Z_FLOOR), V(1, 0, 0), tilt)
+    a = math.radians(tilt)
+    b.translate(V(0, sgn * math.cos(a), sgn * math.sin(a)) * grow)
+    b.rotate(V(0, 0, 0), V(0, 0, 1), WINDOW[end])
+    b.translate(V(CX, CY, 0))
+    return b
+
+
+def window_region(grow=0.0, z0=Z_FLOOR, z1=Z_SPLIT + 5):
+    """Everything between the two flanks, above z0, from r 30 out past the wall."""
+    a0, a1 = WINDOW[0] - 30, WINDOW[1] + 30
+    region = arc(30.0, R_OUT + 1, a0, a1, z0, z1)
+    return region.common(_flank_side(0, grow)).common(_flank_side(1, grow))
+
+
+def make_window():
+    """The plastic wall in the shell's notch: SEAL_GAP above the floor and off both flanks, flush with the rim at the
+    top, with the USB-C opening and the door's pocket and lower groove in it, and two feet with pegs inside."""
+    w = annulus(R_IN, R_OUT, Z_FLOOR + SEAL_GAP, Z_SPLIT).common(window_region(-SEAL_GAP, Z_FLOOR - 1))
+    for a in WINDOW_FEET:
+        half = deg(FOOT_W / 2, R_IN)
+        w = w.fuse([arc(FOOT_R0, R_IN + 0.01, a - half, a + half, Z_FLOOR, Z_FLOOR + FOOT_H),
+                    cyl(PEG_D / 2, Z_FLOOR - PEG_L, Z_FLOOR + 0.01, *at(a, PEG_R))])
+    w = w.cut(radial_box(F["usb"]["angle"], R_BOARD - 1.0, R_OUT + 2, USB_W, USB_Z0, USB_Z1))
+    w = w.cut(door_pocket())
+    return largest_solid(w.removeSplitter())
+
+
+def make_window_gasket():
+    """The foam strip under the window, on the shell's notch floor and up both flanks, drawn squeezed: what is left
+    of the wall's band between the shell and the window."""
+    band = annulus(R_IN + SEAL_INSET, R_OUT - SEAL_INSET, Z_FLOOR, Z_SPLIT).common(window_region(0.0))
+    band = band.cut(window_region(-SEAL_GAP, Z_FLOOR + SEAL_GAP))
+    return band.removeSplitter()
 
 
 # --- Parts ------------------------------------------------------------------
 
-def underside_art(font):
-    """Radar dial and name, drawn as seen from below (mirrored in X), as solids from Z_BOTTOM up."""
-    art = []
-    for r in (20.0, 28.0):
-        art.append(annulus(r - 0.25, r + 0.25, 0, DEBOSS_ART, 0, 0))
-    for k in range(12):
-        a = math.radians(30 * k)
-        tick = Part.makeBox(1.5, 0.5, DEBOSS_ART, V(28.5, -0.25, 0))
-        tick.rotate(V(0, 0, 0), V(0, 0, 1), 30 * k)
-        art.append(tick)
-    art.append(text_solid("FINDER PUCK", TEXT_H, DEBOSS_TEXT, 0, 3.0, font))
-    # "1 [ ]  2 [ ]": tick one with a paint pen so the two pucks can be told apart.
-    art.append(text_solid("1", TEXT_H, DEBOSS_TEXT, -8.0, -6.0, font))
-    art.append(text_solid("2", TEXT_H, DEBOSS_TEXT, 3.5, -6.0, font))
-    for x in (-3.5, 8.0):
-        box = Part.makeBox(4.0, 4.0, DEBOSS_TEXT, V(x - 2.0, -8.0, 0))
-        art.append(box.cut(Part.makeBox(2.8, 2.8, DEBOSS_TEXT + 1, V(x - 1.4, -7.4, -0.5))))
-    comp = Part.makeCompound(art)
-    m = FreeCAD.Matrix()
-    m.A11 = -1.0                                   # mirror X: it is read from below
-    comp = comp.transformGeometry(m)
-    comp.translate(V(CX, CY, Z_BOTTOM))
-    return comp
+def bay_cavity():
+    """The battery bay below the board, a bore smaller than the one the board sits in: its wall runs round the bolt
+    bosses and the lanyard boss with BOSS_FILLET inside corners."""
+    cav = cyl(R_BAY, Z_FLOOR, -T_BOARD + 0.01)
+    for x, y in BOLTS["points"]:
+        cav = cav.cut(cyl(SHELL_BOSS_R, Z_FLOOR - 1, 1, *pt(x, y)))
+    cav = cav.cut(cyl(LANYARD_BOSS, Z_FLOOR - 1, LANYARD_TOP, *at(LANYARD_ANGLE, LANYARD_R)))
+    cav = cav.removeSplitter()
+    corners = [e for e in cav.Edges if e.BoundBox.ZLength > 1.0 and e.BoundBox.XLength < 1e-3 and e.BoundBox.YLength < 1e-3]
+    try:
+        f = cav.makeFillet(BOSS_FILLET, corners)
+        if f.isValid():
+            return f
+    except Exception:
+        pass
+    print("bay: %d inside corners NOT rounded  <-- CHECK" % len(corners))
+    return cav
 
 
-def make_shell(font):
-    body = cyl(R_OUT, Z_BOTTOM, Z_SPLIT)
-    body = chamfer_outer(body, 0.8, Z_BOTTOM)
-    body = body.cut(cyl(R_IN, Z_FLOOR, Z_SPLIT + 1))
-    # Lap lip at the inner edge of the wall top, overhanging the inside on a 45 degree underside; the
-    # rest of the wall top (R_LAP1 to R_OUT) is the seal's seat.
-    under = R_IN - R_LAP0
-    body = body.fuse(revolved([(R_LAP0, Z_SPLIT + LIP_H), (R_LAP1, Z_SPLIT + LIP_H), (R_LAP1, Z_SPLIT - under - 0.01),
-                               (R_IN + 0.01, Z_SPLIT - under - 0.01), (R_LAP0, Z_SPLIT)]))
-    # The lip is left out over the GPS module's corners (data-sheet maximum) and over the board notch, where
-    # the battery wires and the pigtail stand.
-    z_top = Z_SPLIT + LIP_H + 1
-    a0, a1 = GPS_CLEAR_ARC
-    body = body.cut(sector(R_LAP0 - 1.0, R_IN, a0, a1, Z_SPLIT - under - 1, z_top).fuse(
-        sector(R_IN - 0.01, R_LAP1 + 0.02, a0, a1, Z_SPLIT, z_top)))
-    a, w = BATT_NOTCH[0], BATT_NOTCH[1]
-    body = body.cut(radial_box(a, R_LAP0 - 1.0, R_IN, w, Z_SPLIT - under - 1, z_top).fuse(
-        radial_box(a, R_IN - 0.01, R_LAP1 + 0.02, w, Z_SPLIT, z_top)))
-    # Rim ledge under the board, with a 45 degree underside so it prints without support.
-    body = body.fuse(revolved([(R_IN - LEDGE_W, -T_BOARD), (R_IN + 0.01, -T_BOARD), (R_IN + 0.01, -T_BOARD - LEDGE_W)]))
-    # Insert bosses up to the board underside.
+def make_shell():
+    """Machined from 6061: from the top (bores, bay, bosses, tapped holes, notch, peg holes), from the back (outer
+    radius, lanyard hole, logo) and from the side (switch slot, scallop, lanyard hole, tether pin hole, flanks)."""
+    body = round_outer(cyl(R_OUT, Z_BOTTOM, Z_SPLIT), BOTTOM_R, Z_BOTTOM)
+    body = body.cut(cyl(R_IN, -T_BOARD, Z_SPLIT + 1))
+    body = body.cut(bay_cavity())
+    body = body.cut(window_region(0.0))
+    for x, y in BOLTS["points"]:                  # the boss in the window stands on its own
+        body = body.fuse(cyl(SHELL_BOSS_R, Z_FLOOR - 0.01, -T_BOARD, *pt(x, y)))
+    down = V(0, 0, -1)
     for x, y in BOLTS["points"]:
         px, py = pt(x, y)
-        body = body.fuse(cyl(BOSS_R, Z_FLOOR, -T_BOARD, px, py))
-    # Lanyard: inward thickening with a chord bore, both mouths fully outside the skin.
-    r0, a0, a1 = LANYARD_BLOCK
-    body = body.fuse(sector(r0, R_IN + 0.01, a0, a1, Z_FLOOR, -T_BOARD - LEDGE_W))
-    half = math.sqrt(R_OUT ** 2 - (LANYARD_R - LANYARD_BORE / 2) ** 2) + 1.0
-    bore = Part.makeCylinder(LANYARD_BORE / 2, 2 * half, V(CX - half, CY - LANYARD_R, LANYARD_Z), V(1, 0, 0))
-    body = lanyard_mouths(body.cut(bore))
-    # Insert holes, counter-sunk so the melt the insert pushes up stays below the board.
-    for x, y in BOLTS["points"]:
-        px, py = pt(x, y)
-        body = body.cut(cyl(INSERT_D / 2, -T_BOARD - INSERT_DEPTH, -T_BOARD + 1, px, py))
-        body = body.cut(cyl(INSERT_SINK_D / 2, -T_BOARD - INSERT_SINK, -T_BOARD + 1, px, py))
-    # USB-C: notch through the wall, open to the parting line (the plate skirt closes it).
-    body = body.cut(radial_box(F["usb"]["angle"], R_BOARD - 1.0, R_OUT + 2, USB_W, USB_Z0, Z_SPLIT + LIP_H + 1))
+        top = V(px, py, -T_BOARD)
+        body = body.cut(cyl(BOLT_D / 2, -T_BOARD - TAP_DEPTH, -T_BOARD + 1, px, py))       # the thread, at its nominal size
+        body = body.cut(drill(top, down, TAP_DRILL, DRILL_DEPTH))
+        body = body.cut(countersink(top, down, BOLT_D, TAP_SINK))
+    # Lanyard: up from the back and in from the side, meeting in the boss.
+    lx, ly = at(LANYARD_ANGLE, LANYARD_R)
+    up, mouth = V(0, 0, 1), V(lx, ly, Z_BOTTOM)
+    body = body.cut(drill(mouth - up, up, LANYARD_D, LANYARD_Z + LANYARD_REACH - Z_BOTTOM + 1))
+    body = body.cut(countersink(mouth, up, LANYARD_D, LANYARD_SINK))
+    inward = V(-math.cos(math.radians(LANYARD_ANGLE)), -math.sin(math.radians(LANYARD_ANGLE)), 0)
+    side = V(*at(LANYARD_ANGLE, R_OUT), LANYARD_Z)
+    body = body.cut(drill(side - inward, inward, LANYARD_D, R_OUT - (LANYARD_R - LANYARD_D / 2) + 1))
+    body = body.cut(countersink(side, inward, LANYARD_D, LANYARD_SINK))
     # Power switch knob, with a finger scallop on the outside so the knob can be reached.  Both stay below
     # the rim, so the seal is unbroken here.
-    body = body.cut(radial_box(F["power_switch"]["angle"], R_BOARD - 2.0, R_OUT + 2, SWITCH_W, SWITCH_Z0, SWITCH_Z1))
-    body = body.cut(radial_box(F["power_switch"]["angle"], R_OUT - SCALLOP_D, R_OUT + 2, SCALLOP_W, SCALLOP_Z0, SCALLOP_Z1))
-    # Blind hole for the switch plug's tether pin, and the USB-C door's pocket and lower groove.
-    body = body.cut(door_pocket())
-    body = body.cut(radial_pin(F["power_switch"]["angle"], R_OUT - SCALLOP_D - PLUG_PIN_L + 0.4, R_OUT, PLUG_PIN_D, SW_PIN_Z))
-    # Battery lead: the board is notched here; the ledge is cut and the wall gets a shallow groove.
+    a = F["power_switch"]["angle"]
+    body = body.cut(local_box(a, R_BOARD - 2.0, R_OUT + 2, -SWITCH_W / 2, SWITCH_W / 2, SWITCH_Z0, SWITCH_Z1, SWITCH_RC))
+    body = body.cut(local_box(a, R_OUT - SCALLOP_D, R_OUT + 2, -SCALLOP_W / 2, SCALLOP_W / 2, SCALLOP_Z0, SCALLOP_Z1,
+                              SCALLOP_RC))
+    body = body.cut(radial_pin(a, R_OUT - SCALLOP_D - PLUG_PIN_L + 0.4, R_OUT, PLUG_PIN_D, SW_PIN_Z))
+    # Battery lead: the board is notched here; the bay's wall gets a slot the cables stand in, floor to ledge, out
+    # to the board's bore (anything beyond it would be an undercut under the rim), with 1.5 mm inside corners.
     angle, width, _ = BATT_NOTCH
-    body = body.cut(radial_box(angle, R_IN - LEDGE_W - 0.5, R_IN + 0.3, width, -4.0, 2.0))
-    # Motor pocket: a shallow recess in the floor.
+    half = deg(width / 2, R_IN)
+    slot = arc(R_BAY - 0.5, R_IN, angle - half, angle + half, Z_FLOOR, -T_BOARD + 0.5)
+    slot = slot.makeFillet(1.5, [e for e in slot.Edges if e.BoundBox.ZLength > 1.0 and e.BoundBox.XLength < 1e-3
+                                 and e.BoundBox.YLength < 1e-3 and math.hypot(e.BoundBox.XMin - CX,
+                                                                             e.BoundBox.YMin - CY) > R_IN - 0.01])
+    body = body.cut(slot)
+    # Motor pocket: a shallow recess in the floor.  Holes for the window's pegs.
     mx, my = pt(*MOTOR_POCKET)
     body = body.cut(cyl(F["motor"]["dia"] / 2 + 0.3, Z_FLOOR - 0.6, Z_FLOOR + 0.01, mx, my))
-    # The flex antenna passes the rim ledge on its way up the wall.
-    body = body.cut(sector(R_IN - LEDGE_W - 0.5, R_IN + 0.05, FLEX_ARC[0] - 2, FLEX_ARC[1] + 2,
-                           -T_BOARD - LEDGE_W - 0.5, -T_BOARD + 0.5, steps=80))
-    # Radar dial and name on the underside.
-    body = body.cut(underside_art(font))
+    for a in WINDOW_FEET:
+        body = body.cut(cyl(PEG_D / 2 + 0.05, Z_FLOOR - PEG_L - 0.2, Z_FLOOR + 0.01, *at(a, PEG_R)))
+    # The OSHW logo on the back.
+    body = body.cut(oshw_vgroove())
     return largest_solid(body.removeSplitter())
 
 
 def make_plate():
     body = cyl(R_OUT, Z_SPLIT + PLATE_GAP, Z_FACE)
     body = chamfer_outer(body, 1.0, Z_FACE)
-    # Hollow: skirt over the shell lip, then the inner wall up to the skin.
-    body = body.cut(cyl(R_SKIRT_IN, Z_SPLIT - 1, Z_SPLIT + LIP_H + 0.2))
+    # Hollow: the skirt over the rim seal, then the inner wall up to the skin.
     body = body.cut(cyl(R_IN, Z_SPLIT - 1, Z_SKIN))
     # Bosses down to the PCB top, bolt bores and counterbores.
     for x, y in BOLTS["points"]:
@@ -508,8 +763,8 @@ def make_plate():
     body = body.cut(cyl(LED_PIPE_BORE / 2, Z_SKIN - 1, Z_FACE + 1, dx, dy))
     ox, oy = at(F["power_switch"]["angle"] - 6, R_IN - 1.9)
     body = body.cut(cyl(0.6, Z_FACE - 0.3, Z_FACE + 1, ox, oy))
-    # The USB-C opening continues up through the skirt (the switch slot stays in the shell), with the door's
-    # pocket and upper groove round it.
+    # The USB-C opening continues up from the window through the skirt, with the door's pocket and upper groove
+    # round it.
     body = body.cut(radial_box(F["usb"]["angle"], R_BOARD - 1.0, R_OUT + 2, USB_W, USB_Z0, USB_Z1))
     body = body.cut(door_pocket())
     return largest_solid(body.removeSplitter())
@@ -629,10 +884,6 @@ def make_bolt(px, py):
     return bolt.cut(hex_prism(SOCKET_AF, z_head + HEAD_H - SOCKET_DEPTH, z_head + HEAD_H + 1, px, py))
 
 
-def make_insert(px, py):
-    return annulus(BOLT_D / 2 - 0.2, INSERT_OD / 2, -T_BOARD - INSERT_L, -T_BOARD, px, py)
-
-
 def make_index():
     return cyl(1.75 / 2, Z_FACE - INDEX_DEPTH, Z_FACE, CX, CY + INDEX_R)
 
@@ -643,9 +894,9 @@ def make_washer(px, py):
 
 
 def make_seal():
-    """The foam seal on the shell rim, drawn squeezed to the rim gap.  At the door it is trimmed to the pocket
-    floor and the land, and it stops at the USB-C opening's sides."""
-    seal = annulus(R_SKIRT_IN + SEAL_INSET, R_OUT - SEAL_INSET, Z_SPLIT, Z_SPLIT + PLATE_GAP)
+    """The foam seal on the rim of the shell and the window, drawn squeezed to the rim gap.  At the door it is
+    trimmed to the pocket floor and the land, and it stops at the USB-C opening's sides."""
+    seal = annulus(R_IN + SEAL_INSET, R_OUT - SEAL_INSET, Z_SPLIT, Z_SPLIT + PLATE_GAP)
     seal = seal.cut(door_pocket())
     return seal.cut(radial_box(F["usb"]["angle"], R_BOARD - 1.0, R_OUT + 2, USB_W, Z_SPLIT - 1, Z_SPLIT + 2))
 
@@ -717,12 +968,12 @@ def door_land():
 
 
 def door_pocket():
-    """What the shell and the plate lose for the door: the pocket over its whole travel and the two grooves,
+    """What the window and the plate lose for the door: the pocket over its whole travel and the two grooves,
     less the sealing land."""
     a = F["usb"]["angle"]
     _, door_h = door_extent()
     _, _, (pz0, pz1) = door_z()
-    a0, a1 = a - door_h - DOOR_TRAVEL - deg(DOOR_CLEAR), a + door_h + deg(DOOR_CLEAR)
+    a0, a1 = a - door_h - deg(DOOR_CLEAR), a + door_h + DOOR_TRAVEL + deg(DOOR_CLEAR)
     g0, g1, gh = DOOR_GROOVE
     pocket = arc(DOOR_FLOOR, R_OUT + 1, a0, a1, pz0, pz1, steps=80)
     pocket = pocket.fuse([arc(g0, g1, a0, a1, pz1 - 0.01, pz1 + gh, steps=80),
@@ -732,7 +983,7 @@ def door_pocket():
 
 def make_door(travel=0.0):
     """The USB-C door, closed (travel 0) or slid open by travel degrees."""
-    a = F["usb"]["angle"] - travel
+    a = F["usb"]["angle"] + travel
     _, door_h = door_extent()
     _, (z0, z1), _ = door_z()
     r_t, h_t = DOOR_TONGUE
@@ -750,7 +1001,7 @@ def make_door(travel=0.0):
 
 def make_door_gasket(travel=0.0):
     """The die-cut foam frame on the door's inside, drawn squeezed onto the land (closed)."""
-    a = F["usb"]["angle"] - travel
+    a = F["usb"]["angle"] + travel
     land_h, _ = door_extent()
     (z0, z1), _, _ = door_z()
     r0 = DOOR_LAND if travel == 0 else DOOR_IN - DOOR_GASKET
@@ -767,7 +1018,7 @@ def make_switch_plug():
     w2 = SWITCH_W / 2
     fw = SCALLOP_W / 2 - 0.2
     xo = x_floor + PLUG_FLANGE_T - 0.1
-    body = local_box(a, SW_PLUG_IN, x_floor + 0.01, -w2 - s, w2 + s, SWITCH_Z0 - s, SWITCH_Z1 + s)
+    body = local_box(a, SW_PLUG_IN, x_floor + 0.01, -w2 - s, w2 + s, SWITCH_Z0 - s, SWITCH_Z1 + s, SWITCH_RC + s)
     flange = local_box(a, x_floor, xo, -fw, fw, SWITCH_Z0 - 1.2, SCALLOP_Z1 - 0.1)
     ridge = local_box(a, xo - 0.01, xo + 0.4, -2.0, 2.0, SWITCH_Z1 - 0.2, SCALLOP_Z1 - 0.1)
     strap = local_box(a, x_floor, xo, -PLUG_STRAP_W / 2, PLUG_STRAP_W / 2, SW_PIN_Z - PLUG_PIN_D / 2 - 0.3, SWITCH_Z0 - 1.19)
@@ -901,7 +1152,6 @@ def min_distance(a, b, limit):
 
 
 def main():
-    font = font_file()
     if GPS_WINDOW == "open":
         print("GPS_WINDOW = open: the sky window is a hole, so the case is NOT sealed (IP55 needs the skin)  <-- CHECK")
     doc = FreeCAD.newDocument("finder_puck_case")
@@ -911,16 +1161,15 @@ def main():
         "Board": board,
         "Panel": make_panel(), "Crystal": make_crystal(), "Battery": make_battery(),
         "Motor": make_motor(), "Antenna": make_antenna(),
-        "Shell": make_shell(font), "Plate": make_plate(), "Ring": make_ring(), "Bezel": make_bezel(),
+        "Shell": make_shell(), "Window": make_window(), "Plate": make_plate(), "Ring": make_ring(), "Bezel": make_bezel(),
         "Cap": make_cap(), "Door": make_door(), "SwitchPlug": make_switch_plug(),
-        "Index": make_index(), "Seal": make_seal(), "CrystalGasket": make_crystal_gasket(), "LidGasket": make_lid_gasket(), "ORing": make_oring(), "DoorGasket": make_door_gasket(),
+        "Index": make_index(), "Seal": make_seal(), "WindowGasket": make_window_gasket(), "CrystalGasket": make_crystal_gasket(), "LidGasket": make_lid_gasket(), "ORing": make_oring(), "DoorGasket": make_door_gasket(),
         "ProxyPlug": make_ph_plug(), "ProxyCables": make_notch_cables(), "ProxyFold": make_fpc_fold(),
         "ProxyUSB": make_usb_overmold(), "ProxyGPS": make_gps_envelope(),
     }
     for i, (x, y) in enumerate(BOLTS["points"]):
         px, py = pt(x, y)
         shapes["Bolt%d" % (i + 1)] = make_bolt(px, py)
-        shapes["Insert%d" % (i + 1)] = make_insert(px, py)
         shapes["Washer%d" % (i + 1)] = make_washer(px, py)
     objs = {}
     for name, shape in shapes.items():
@@ -928,10 +1177,10 @@ def main():
         o.Shape = shape
         objs[name] = o
 
-    # Interference: printed parts against everything they must clear.
-    printed = ("Shell", "Plate", "Ring", "Bezel", "Cap", "Door", "SwitchPlug")
-    hardware = tuple(n for n in shapes if n.startswith(("Bolt", "Insert", "Washer"))) + ("Index", "Seal", "ORing", "DoorGasket",
-                                                                                    "CrystalGasket", "LidGasket")
+    # Interference: the made parts (the machined shell, the printed rest) against everything they must clear.
+    printed = ("Shell", "Window", "Plate", "Ring", "Bezel", "Cap", "Door", "SwitchPlug")
+    hardware = tuple(n for n in shapes if n.startswith(("Bolt", "Washer"))) + ("Index", "Seal", "WindowGasket", "ORing",
+                                                                              "DoorGasket", "CrystalGasket", "LidGasket")
     proxies = tuple(n for n in shapes if n.startswith("Proxy"))
     bad = 0
     close = {}
@@ -950,37 +1199,48 @@ def main():
             flag = "" if vol < 0.001 else "  <-- CHECK"
             if flag:
                 bad += 1
-            if flag or not other.startswith(("Bolt", "Insert", "Washer")):
+            if flag or not other.startswith(("Bolt", "Washer")):
                 print("overlap %-10s vs %-11s %8.3f mm^3%s" % (part, other, vol, flag))
             near = min_distance(objs[part].Shape, objs[other].Shape, REPORT_GAP)
             if near:
-                kind = other.rstrip("0123456789")      # Bolt1..4, Insert1..4 and Washer1..4 collapse into one line each
+                kind = other.rstrip("0123456789")      # Bolt1..4 and Washer1..4 collapse into one line each
                 key = (part, kind, round(near[0], 3))
                 close.setdefault(key, [near[1], 0])[1] += 1
     # Clearances: every printed-vs-other pair closer than REPORT_GAP, tightest first.  Contacts are the
-    # designed seats (board on ledge, panel on ring, crystal under lip, flange under skin, bosses on the PCB).
+    # designed seats (board on the bay's step, panel on ring, crystal under lip, flange under skin, bosses on the PCB).
     for (part, kind, d), (p, n) in sorted(close.items(), key=lambda kv: kv[0][2]):
         print("gap %-10s vs %-11s %6.3f mm at (%6.1f, %6.1f, %5.1f)%s" % (
             part, kind + ("x%d" % n if n > 1 else ""), d, p.x, p.y, p.z, "  contact" if d < 1e-3 else ""))
     # The door slid open: it must clear everything in its pocket and uncover the plug overmold.
     opened = make_door(DOOR_TRAVEL).fuse(make_door_gasket(DOOR_TRAVEL))
-    for other in ("Shell", "Plate", "Seal", "ProxyUSB"):
+    for other in ("Window", "Plate", "Seal", "ProxyUSB"):
         common = opened.common(objs[other].Shape)
         vol = common.Volume if not common.isNull() else 0.0
         flag = "" if vol < 0.001 else "  <-- CHECK"
         bad += 1 if flag else 0
         near = min_distance(opened, objs[other].Shape, 1.0)
         print("door open vs %-9s %8.3f mm^3, nearest %s%s" % (other, vol, "%.3f mm" % near[0] if near else "> 1 mm", flag))
+    # Radio: how close the aluminium comes to the antenna and to the GPS module (at its limits), and how much of the
+    # window gasket and rim seal there is to cut.
+    for name in ("Antenna", "ProxyGPS"):
+        near = min_distance(objs["Shell"].Shape, objs[name].Shape, 20.0)
+        print("rf: aluminium to %-8s %s" % (name.replace("Proxy", ""), "%.1f mm at (%.1f, %.1f, %.1f)" % (
+            near[0], near[1].x, near[1].y, near[1].z) if near else "> 20 mm"))
+    wg = objs["WindowGasket"].Shape
+    r_mid = (R_IN + R_OUT) / 2
+    print("window gasket: %.0f mm of 1.0 mm foam strip, %.1f mm wide, along the notch floor and up both flanks "
+          "(%d solid(s), %.1f mm^3 squeezed)" % (
+              math.radians(WINDOW[1] - WINDOW[0]) * r_mid + 2 * (Z_SPLIT - Z_FLOOR) / math.sin(math.radians(FLANK)),
+              R_OUT - R_IN - 2 * SEAL_INSET, len(wg.Solids), wg.Volume))
     print("case: %.1f mm across, %.1f mm tall (face at Z %.1f, bottom at Z %.1f); %d interference(s); "
-          "%d pair(s) closer than %.1f mm; font %s" % (
-              2 * R_OUT, Z_FACE - Z_BOTTOM, Z_FACE, Z_BOTTOM, bad, len(close), REPORT_GAP, os.path.basename(font)))
+          "%d pair(s) closer than %.1f mm" % (
+              2 * R_OUT, Z_FACE - Z_BOTTOM, Z_FACE, Z_BOTTOM, bad, len(close), REPORT_GAP))
 
     out = os.path.join(CASE, NAME + "_case.FCStd")
     if os.path.exists(out):
         os.remove(out)
     doc.saveAs(out)
-    # 0.01 mm deflection: at 0.02 the mesher leaves sliver triangles that cross each other where the
-    # lanyard fillets run tangent to the wall; every STL must come out closed and free of self-intersections.
+    # 0.01 mm deflection, so fine fillets mesh cleanly; every STL must come out closed and free of self-intersections.
     for name in printed:
         mesh = MeshPart.meshFromShape(Shape=objs[name].Shape, LinearDeflection=0.01,
                                       AngularDeflection=math.radians(8), Relative=False)
@@ -991,6 +1251,7 @@ def main():
             name, mesh.CountFacets, "closed" if mesh.isSolid() else "NOT closed", crossings, flag))
     Import.export([objs[n] for n in printed], os.path.join(CASE, NAME + "_case.step"))
     write_gasket_template(os.path.join(CASE, NAME + "_gaskets.svg"))
+    write_logo_template(os.path.join(CASE, NAME + "_logo_vgroove.svg"))
     print("wrote", out)
 
 
