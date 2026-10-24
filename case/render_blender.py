@@ -7,7 +7,7 @@ Studio renders of the finder puck in Blender 3.5 (Cycles on the Metal GPU).
 MESH_DIR holds the STLs written by export_meshes.py (default case/blender_mesh).  Views:
   hero  one puck face up, searching (arrow and "38 m"), orange cord through the lanyard hole
   pair  two pucks that have found each other: arrows point at one another and the bezels glow (beacon)
-  back  one puck turned over like a pancake, showing the anodised back and the V-carved OSHW logo
+  back  one puck turned over like a pancake, showing the anodised back and the V-grooved OSHW logo
 Renders go to docs/finder_puck_render[_<view>].png; each scene is also saved as <MESH_DIR>/finder_puck_<view>.blend
 so it can be opened and tweaked by hand.  The screen graphics, cord and cord lock exist only here, not in the case model.
 Units: the assembly's mm scaled to metres, each puck centred on its own empty (12 o'clock = local +Y, button = -Y).
@@ -39,7 +39,7 @@ Z_SCREEN = 5.5                             # panel top; the crystal starts at 5.
 R_ACTIVE = 32.4 / 2
 R_OUT = 38.2                               # case radius
 LANYARD_R, LANYARD_Z = 35.3, -6.2          # at 6 o'clock: hole up from the back at r LANYARD_R, side hole at LANYARD_Z
-LOGO_R, VCARVE_DEPTH = 11.5, 0.4           # the V-carved logo on the back (build_case.py LOGO_W / 2, VCARVE_DEPTH)
+LOGO_R, VGROOVE_DEPTH = 11.5, 0.3          # the V-grooved logo on the back (build_case.py LOGO_W / 2, VGROOVE_DEPTH)
 CORD_R = 1.0                               # 2 mm cord in the 3 mm holes
 LOCK_R, LOCK_L = 3.0, 9.0                  # barrel cord lock
 PARTS = ["Shell", "Window", "Plate", "Ring", "Bezel", "Cap", "Index", "Crystal", "Panel", "Board",
@@ -258,11 +258,11 @@ def import_parts(M):
 
 
 def bare_logo(obj, M):
-    """The V-carve cuts through the anodising: its walls and floor show bare aluminium."""
+    """The logo's V-groove cuts through the anodising: its walls show bare aluminium."""
     obj.data.materials.append(M["bare"])
     for p in obj.data.polygons:
         c = p.center / MM - CENTRE
-        if (c.x ** 2 + c.y ** 2) ** 0.5 < LOGO_R + 0.5 and Z_BOTTOM + 0.01 < c.z < Z_BOTTOM + VCARVE_DEPTH + 0.01:
+        if (c.x ** 2 + c.y ** 2) ** 0.5 < LOGO_R + 0.5 and Z_BOTTOM + 0.01 < c.z < Z_BOTTOM + VGROOVE_DEPTH + 0.01:
             p.material_index = 1
 
 
@@ -490,7 +490,7 @@ def view_back(scene, parts, M):
     puck.rotation_euler = (math.radians(180), 0, math.radians(166))
     puck.location = (0, 0, (Z_BOTTOM + Z_FACE) * MM)
     make_cord(puck, M, (1.0, -0.35))                         # off to the right
-    # A low light from behind left rakes across the underside so the V-carve's walls read.
+    # A low light from behind left rakes across the underside so the V-groove's walls read.
     graze = bpy.data.lights.new("Graze", "AREA")
     graze.shape = "RECTANGLE"
     graze.size, graze.size_y = 0.5, 0.05

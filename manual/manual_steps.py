@@ -45,7 +45,7 @@ PARTS = {
     "sheet":   ("hardware", "Insulation sheet", 1, "0.2 mm Kapton or PET, 36 × 52 mm", "card_sheet"),
     "cord":    ("hardware", "Cord", 1, "Ø2.5 mm, 300 mm", "card_cord"),
     "seal":    ("hardware", "Seam seal", 1, "1.0 mm closed-cell foam, Ø72.9–76.3 mm, open at 3 o'clock", "card_seal"),
-    "windowgasket": ("hardware", "Window gasket", 1, "1.0 mm closed-cell foam strip, 1.7 × 103 mm", "card_windowgasket"),
+    "windowgasket": ("hardware", "Window gasket", 1, "1.0 mm closed-cell foam strip, 1.7 × 87 mm", "card_windowgasket"),
     "washer":  ("hardware", "Washer M2.5", 4, "nylon DIN 433, 5 × 2.7 × 0.5 mm", "card_washer"),
     "oring":   ("hardware", "O-ring", 1, "9 × 1 mm silicone", "card_oring"),
     "doorgasket": ("hardware", "Door gasket", 1, "0.5 mm closed-cell foam frame, 15.9 × 9.4 mm, 13.7 × 7.2 mm hole", "card_doorgasket"),
@@ -73,8 +73,8 @@ TOOL_GROUPS = (("required", "Required"), ("recommended", "Recommended"))
 
 # Shown between Tools and step 1.
 BEFORE = (
-    ("Make", "The shell is CNC machined from 6061 and black anodised (the logo is V-carved after anodising, or "
-             "masked, so it shows bare metal). Print the antenna window upside down (rim on the bed), the ring upside down "
+    ("Make", "The shell is CNC machined from 6061 and black anodised (the logo is V-grooved after anodising, so "
+             "it shows bare metal). Print the antenna window upside down (rim on the bed), the ring upside down "
              "(top face on the bed), the plate face down, the cap pocket down; 0.2 mm layers, four walls. Print the "
              "bezel in clear resin: its flange cannot be bridged and its fits are 0.25 mm. Print the door standing on "
              "its edge and the switch plug in TPU, standing on its strap end."),

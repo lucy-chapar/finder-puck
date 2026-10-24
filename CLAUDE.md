@@ -34,10 +34,10 @@ vendored as `tools/kicad_helpers.py`; its own Digital Sand paths are unused or o
   `finder_puck.kicad_pro` when it quits and leaves `.kicad_prl` and `.lck` files: restore the project file with
   `git checkout finder_puck.kicad_pro` afterwards.
 - Case: `case/build_case.py` (freecadcmd) builds the machined aluminium shell (black anodised, tapped M2.5 holes,
-  V-carved OSHW logo, cross-drilled lanyard hole) and the printed antenna window, plate, ring, bezel, cap, sliding
+  V-grooved OSHW logo, cross-drilled lanyard hole) and the printed antenna window, plate, ring, bezel, cap, sliding
   USB-C door and TPU switch plug, plus the bolts, washers, index stub, flex antenna, seam seal, window gasket,
   O-ring, door, crystal and lid gaskets and interference proxies as reference solids, from `mech/`, the 1:1 gasket
-  template `case/finder_puck_gaskets.svg` and the 1:1 logo drawing `case/finder_puck_logo_vcarve.svg`. The shell
+  template `case/finder_puck_gaskets.svg` and the 1:1 logo drawing `case/finder_puck_logo_vgroove.svg`. The shell
   must stay machinable on a 3-axis mill (no undercuts, inside radii at least the cutter's), and no aluminium may
   come between an antenna and the sky: the GPS looks up through the plastic plate, the LoRa flex sits on the
   plastic window (the `rf:` lines give the clearances). It must report 0 interferences, its `gap` lines (every

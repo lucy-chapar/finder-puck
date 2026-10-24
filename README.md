@@ -8,12 +8,12 @@ LEDs on the face strobe a "beacon me" pattern for the last few metres, and there
 ![Case, closed](docs/case-closed.png)
 
 76.4 mm across, 18.3 mm thick. The body is a CNC-machined 6061 aluminium shell, black anodised, under a matte black
-plastic face; between 12 and 4 o'clock the side wall is a black plastic antenna window, because aluminium would
+plastic face; between 12 and 3 o'clock the side wall is a black plastic antenna window, because aluminium would
 block the radios (see [Aluminium shell and the radios](#aluminium-shell-and-the-radios)). Orange anodised
 socket-cap bolts on the face pass through the PCB, a 10 mm orange button at 6 o'clock, a clear bezel around the
 crystal that the four beacon LEDs light from below, and an orange index dot at 12 o'clock over the GPS patch, which
-looks through a 0.9 mm skin. The back is plain anodised aluminium with the Open Source Hardware logo V-carved through
-to bare metal; the cord goes in at the side at 6 o'clock and out of the back. The case is designed to IP55 (dust protected, water
+looks through a 0.9 mm skin. The back is plain anodised aluminium with the Open Source Hardware logo engraved as a
+V-groove line through to bare metal; the cord goes in at the side at 6 o'clock and out of the back. The case is designed to IP55 (dust protected, water
 jets from any direction) with the USB-C door slid shut and the switch plug pushed home; see [Sealing (IP55)](#sealing-ip55).
 [Build guide (PDF)](docs/finder_puck_build_guide.pdf).
 
@@ -34,7 +34,7 @@ jets from any direction) with the USB-C door slid shut and the switch plug pushe
 | `case/finder_puck_case.FCStd` | FreeCAD assembly: board, panel, crystal, battery, motor, antenna, bolts, shell, window, plate, ring, bezel, cap |
 | `case/finder_puck_case.step` | All made parts in STEP: the machine shop quotes the shell from this |
 | `case/finder_puck_{window,plate,ring,bezel,cap}.stl` | Print files (`finder_puck_shell.stl` too, for previews) |
-| `case/finder_puck_logo_vcarve.svg`, `case/oshw_logo.svg` | 1:1 V-carve drawing of the back's logo for the machinist; the logo's source path (Simple Icons, CC0) |
+| `case/finder_puck_logo_vgroove.svg`, `case/oshw_logo.svg` | 1:1 drawing of the back logo's V-groove path for the machinist; the logo's source path (Simple Icons, CC0) |
 | `case/finder_puck_gaskets.svg` | 1:1 cutting template for the lid, crystal and door gaskets |
 | `case/finder_puck_{door,switchplug}.stl` | The sliding USB-C door and the TPU switch plug |
 | `docs/finder_puck_build_guide.pdf` | Step-by-step assembly guide (IKEA style) |
@@ -82,16 +82,16 @@ Z = 0 is the top of the PCB.
   Ø68.8 bore under the board's Ø72.8 one, so the step between them is the 2 mm ledge the board rests on; four
   Ø6.5 bosses with tapped M2.5 holes (5 mm of thread, blind) that run into the bay's wall with 1.5 mm inside radii
   (a 3 mm cutter); a pocket for the 10 mm coin motor at 2 o'clock; a slot in the bay wall at 304° for the battery
-  lead and the antenna pigtail; and the switch slot (1 mm corner radii) with its finger scallop (2 mm radii) and the
-  switch plug's Ø1.6 pin hole, all below the rim, so the seam seal passes over them unbroken. Between 12 and 4
-  o'clock (−38° to 81° at the floor) the wall is cut down to the floor for the antenna window, and the cut's two
+  lead and the antenna pigtail (floor to ledge, out to the board's bore, 1.5 mm inside radii); and the switch slot (1 mm corner radii) with its finger scallop (2 mm radii) and the
+  switch plug's Ø1.6 pin hole, all below the rim, so the seam seal passes over them unbroken. Between 12 and 3
+  o'clock (−14° to 81° at the floor) the wall is cut down to the floor for the antenna window, and the cut's two
   ends are 60° flanks, so the window gasket on them is squeezed by the bolts like the rim seal is; the boss at 45°
-  stands on its own there. Two Ø2.1 holes in that floor take the window's pegs. The outer edge of the back has a
-  1 mm radius. The back is plain apart from the Open Source Hardware logo, 22 mm across, V-carved with a 90° bit to a
-  0.4 mm flat depth (45° walls, a flat floor, sharp outside corners), after anodising so it shows bare aluminium
-  (`case/finder_puck_logo_vcarve.svg` is the 1:1 drawing). The lanyard is two Ø3.0 holes drilled square to the
-  surface at 6 o'clock, one up from the back (r 35.3) and one in from the side (Z −6.2), meeting in a boss inside
-  the wall, with 0.4 mm countersinks on both mouths; deburr the inside of the bend.
+  stands on its own there, and the one at 315° stays whole outside it. Two Ø2.1 holes in that floor take the window's pegs. The outer edge of the back has a
+  1 mm radius. The back is plain apart from the Open Source Hardware logo, 22 mm across, engraved as a line: a 90°
+  V-bit follows its outline (a contour, not a pocket) 0.3 mm deep, so the groove is 0.6 mm wide, after anodising so
+  it shows bare aluminium (`case/finder_puck_logo_vgroove.svg` is the 1:1 drawing). The lanyard is two Ø3.0 holes drilled square to the
+  surface at 6 o'clock, one up from the back (r 35.3, stopping 1 mm above the side hole's axis, so its point stays
+  0.7 mm under the boss's top) and one in from the side (Z −6.2), meeting in a boss inside the wall, with 0.4 mm countersinks on both mouths; deburr the inside of the bend.
 - **Window** (black, printed): the plastic wall that fills the shell's notch, 0.6 mm clear of the notch floor and
   both flanks (normal to each face: the window gasket's squeeze), flush with the shell's rim at the top. It carries
   the 915 MHz flex antenna on its inside, the USB-C opening up to the parting line, the door's pocket with its
@@ -140,8 +140,8 @@ Z = 0 is the top of the PCB.
   flush with the wall (0.05 mm proud, three grip ribs), held by tongues in the two grooves, so it is captive
   once the plate is on. A die-cut 0.5 mm closed-cell foam frame on its inside rides 0.05 mm clear of the pocket
   floor while it slides and is squeezed to 0.3 mm (40 %) on the land when it is shut: a sliding seal that only
-  compresses at the end of its travel, so it doesn't drag or wear. Shut is towards 3 o'clock (the pocket's end
-  stops it over the land); open uncovers the whole USB-C plug overmold.
+  compresses at the end of its travel, so it doesn't drag or wear. It slides open towards 2 o'clock; shut, the pocket's
+  clockwise end stops it over the land; open uncovers the whole USB-C plug overmold.
 - **Switch plug** (TPU 85A–95A): its body fills the switch slot 0.1 mm oversize, 0.14 mm clear of the knob, its
   flange lies on the scallop floor, with a grip ridge and a strap to a pin glued into the shell. Lift it to
   switch on or off.
@@ -206,17 +206,22 @@ higher on the window before anything else.
 Type II, class 2, about 10–15 µm), ±0.05 mm on the two bores, the bosses' faces and the flanks, ±0.1 mm elsewhere,
 and with these notes:
 
-- Three setups. Top: the two bores, the bay and its bosses, the notch and its flanks (the flanks are planes, cut with
-  a radial-axis end mill or a 3-axis ball pass), the motor pocket, the cable slot, the peg holes, the M2.5 holes
-  (tap drill Ø2.05 × 6 mm, thread 5 mm, 0.3 mm countersink). Back: the 1 mm outer radius, the lanyard's back hole,
-  the logo. Side (4th axis or a vise on the flat of the back): the switch slot and scallop, the plug's pin hole, the
-  lanyard's side hole.
-- Smallest tool: 2 mm (the switch slot's 1 mm corners); bosses meet the bay wall with 1.5 mm radii; the 6 mm wide
-  cable slot is cut by a 3 mm cutter. Wall 1.8 mm, floor 1.8 mm; no undercuts.
+- Three setups. Top: the two bores, the bay and its bosses, the notch and its flanks, the motor pocket, the cable
+  slot, the peg holes, the M2.5 holes (tap drill Ø2.05 × 6 mm, thread 5 mm, 0.3 mm countersink). Back: the 1 mm
+  outer radius, the lanyard's back hole, the logo. Side, on a 4th axis or an indexing fixture (two stations 25°
+  apart, both radial): the switch slot and scallop and the plug's pin hole at 245°, the lanyard's side hole at 270°.
+  Every other face is reachable straight down from the top or straight up from the back.
+- The flanks are planes 60° from the floor, each through the radial line at the floor's corner, so a 60° (30° per
+  side) chamfer mill on the top setup cuts each one in a single pass along that line, its point in the corner. That
+  needs about 11 mm of flute: the notch is 10.9 mm deep. A ball-end 3D pass works too. Break the flanks' sharp
+  (60°) edges where they meet the outside and the rim.
+- Smallest tool: 2 mm (the switch slot's 1 mm corners); bosses meet the bay wall with 1.5 mm radii, and so do the
+  6 mm wide cable slot's corners (a 3 mm cutter, 6.3 mm deep). Wall 1.8 mm, floor 1.8 mm; no undercuts.
 - Mask the tapped holes and the seal faces (rim, notch floor, flanks) from anodising, or chase the threads after.
-- V-carve the logo after anodising, with a 90° V-bit to a 0.4 mm flat depth (`case/finder_puck_logo_vcarve.svg`,
-  centred on the case axis, 12 o'clock up when you look at the back), so it reads as bare aluminium. Carved before
-  anodising, it would come out black on black.
+- Engrave the logo after anodising: a V-groove along its outline (contour, not pocket), 90° V-bit, tip 0.3 mm deep
+  on the line, 0.6 mm wide at the surface (`case/finder_puck_logo_vgroove.svg`, centred on the case axis,
+  12 o'clock up when you look at the back), so it reads as a bare aluminium line. Cut before anodising, it would come
+  out black on black.
 - Deburr the inside of the lanyard's bend so it does not saw the cord.
 
 ### Seeing the beacon from the side
@@ -249,7 +254,7 @@ IP55 is dust protected (no harmful deposit) and water jets from any direction (I
 | Path | Seal |
 |---|---|
 | Shell-to-plate seam | 1.0 mm closed-cell foam (EPDM, neoprene or PORON), a 1.7 mm wide ring (Ø72.9–76.3) on the rim of the shell and the window under the plate's 1.8 mm skirt, squeezed to 0.6 mm (40 %) by the bolted stack. The plate's bosses stay the datum, so the squeeze does not depend on how hard the bolts are done up. At the door it runs out to the pocket floor and the land, and it is open only across the USB-C opening itself, inside the door's gasket |
-| Shell to window | a 1.0 mm closed-cell foam strip, 1.7 mm wide and about 103 mm long, along the notch floor and up both 60° flanks to the rim, where the seam seal's ring runs over its ends; squeezed to 0.6 mm normal to each face. The window's feet stand on the floor, so its squeeze is set by the parts, not by the bolts |
+| Shell to window | a 1.0 mm closed-cell foam strip, 1.7 mm wide and about 87 mm long, along the notch floor and up both 60° flanks to the rim, where the seam seal's ring runs over its ends; squeezed to 0.6 mm normal to each face. The window's feet stand on the floor, so its squeeze is set by the parts, not by the bolts |
 | USB-C opening | Sliding door: a die-cut 0.5 mm closed-cell foam frame on its inside, squeezed 40 % on a raised land round the opening when shut (and clear of the pocket while sliding) |
 | Switch slot | TPU plug in the scallop; the slot no longer reaches the seam |
 | Button | 9 × 1 mm silicone O-ring on the cap, in the bezel's sleeve (grease it) |
@@ -286,7 +291,7 @@ Made in Blender 3.5 (Cycles, Metal GPU) from the FreeCAD assembly. `regen.sh` do
     blender -b --python case/render_blender.py -- hero,pair,back 512 2400
 
 These renders predate the aluminium shell (they show the printed case and the old debossed back); `render_blender.py`
-already has the anodised shell, the bare V-carve, the window and the new cord route, so re-run it. The screen
+already has the anodised shell, the bare V-groove logo, the window and the new cord route, so re-run it. The screen
 graphics, the cord and the cord lock exist only in the Blender scene. Each view is also saved as
 `case/blender_mesh/finder_puck_<view>.blend` for hand tweaking. The hero's rim light is placed from the camera's
 mirror angle off the crystal; move that camera and the light's reflection slides onto the screen.
@@ -379,7 +384,7 @@ ordered. The rest can be ordered with the boards; the AliExpress lines take long
 | 0.2 mm PET or Kapton sheet (insulation, 36 × 52 mm) | [AliExpress 1005006263159926](https://www.aliexpress.com/item/1005006263159926.html): clear PET, pick "A4 Thick 0.2mm 10PCS" | 1 pack | $7 | 2–3 weeks | 0.15–0.25 mm thick (the bay leaves 0.5 mm above the cell) |
 | Ø2.5 mm cord, orange, 300 mm a puck | [AliExpress 32991846600](https://www.aliexpress.com/item/32991846600.html): 2.5 mm paracord in orange (it has a reflective tracer), 20 m | 1 | $1.30 | 2–3 weeks | No more than 2.6 mm across, so it goes round the bend in the Ø3 mm lanyard holes (melt the ends to a point and pull it through with a loop of thin wire) |
 | 1.75 mm filament: orange (cap, index stub) and matte black (window, plate, ring) | [Bambu Lab PLA Matte](https://us.store.bambulab.com/products/pla-matte) in Mandarin Orange and Charcoal, or any matte PLA; PETG if the puck may sit in a hot car. Two pucks take about 50 g of black and 2 g of orange | 1 spool each | $20 | A few days | A 1.75 mm offcut of the orange slides into the Ø1.8 mm index hole |
-| Closed-cell foam sheet, 1.0 mm and 0.5 mm, one adhesive side (seam seal: a 1.7 mm wide ring, Ø72.9–76.3 mm, cut with a compass cutter; window gasket: a 1.7 × 103 mm strip; door gasket: a 15.9 × 9.4 mm frame with a 13.7 × 7.2 mm hole) | EPDM, neoprene or PORON foam; not yet sourced, buy to the spec | 1 sheet | | | 1.0 mm under light pressure, closed cell (it does not soak up water) |
+| Closed-cell foam sheet, 1.0 mm and 0.5 mm, one adhesive side (seam seal: a 1.7 mm wide ring, Ø72.9–76.3 mm, cut with a compass cutter; window gasket: a 1.7 × 87 mm strip; door gasket: a 15.9 × 9.4 mm frame with a 13.7 × 7.2 mm hole) | EPDM, neoprene or PORON foam; not yet sourced, buy to the spec | 1 sheet | | | 1.0 mm under light pressure, closed cell (it does not soak up water) |
 | O-ring 9 × 1 mm (ID × section), silicone (button) | Any metric O-ring kit or seller; not yet sourced | 4 | | | 1.0 mm section; it sits in the cap's groove without stretching |
 | Nylon washer DIN 433 M2.5 (2.7 × 5 × 0.5 mm) | Any; not yet sourced | 10 | | | At most 5.0 mm across (the counterbore is Ø5.2) and 0.5 mm thick |
 | TPU filament 85A–95A, black (the switch plug) | Any; under 1 g a puck | 1 spool or offcut | | | |

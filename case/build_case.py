@@ -4,7 +4,7 @@ Case for the finder puck, built from the board's feature file.
 A machined aluminium shell and four printed parts clamp together with four M2.5 screws that pass through the PCB:
 
   SHELL  (6061-T6, black anodised)  battery bay, motor pocket, tapped bolt bosses, cross-drilled lanyard hole,
-                                switch slot, the OSHW logo V-carved into the back, and a notch from 1 to 4
+                                switch slot, the OSHW logo V-grooved into the back, and a notch from 12 to 3
                                 o'clock (the antenna window) where its wall is cut down to the floor
   WINDOW (black)                the wall in that notch: plastic, so the LoRa flex antenna on its inside and the
                                 USB-C door in it are not behind metal.  Pegs into the shell's floor locate it
@@ -105,7 +105,7 @@ GAP = 0.4                        # board edge to wall
 WALL = 1.8
 R_IN = R_BOARD + GAP             # 36.4
 R_OUT = R_IN + WALL              # 38.2 -> 76.4 mm across
-FLOOR = 1.8                      # leaves 1.4 mm under the 0.4 mm V-carve and 1.2 mm under the motor pocket
+FLOOR = 1.8                      # leaves 1.5 mm under the 0.3 mm logo groove and 1.2 mm under the motor pocket
 BAY = 6.3                        # 5.3 mm cell on 0.5 mm foam, 0.5 mm air above it
 Z_FLOOR = -T_BOARD - BAY         # -7.9
 Z_BOTTOM = Z_FLOOR - FLOOR       # -9.7
@@ -120,10 +120,11 @@ PLATE_GAP = 0.6                  # ... squeezed to the rim gap (40 %): the bosse
 # Antenna window: between WINDOW (angles at the notch floor) the shell's wall is cut down to the floor, with
 # FLANK degree flanks at the two ends (so the bolts' clamp squeezes the foam strip on them), and a plastic wall
 # part fills it, SEAL_GAP clear of the shell all round.  It stands on two feet with pegs in the shell's floor.
-WINDOW = (-38.0, 81.0)           # 4 o'clock to 12 o'clock: the USB-C door's pocket, the antenna, a few mm margin
+WINDOW = (-14.0, 81.0)           # 3 to 12 o'clock: the USB-C door's pocket, the antenna, a few mm margin.  The
+                                 # bolt boss at -45 stays whole: a flank through it could not be cut with one pass
 FLANK = 60.0
 SEAL_GAP = PLATE_GAP             # the window gasket (1.0 mm foam strip) squeezed to 0.6 mm, normal to each face
-WINDOW_FEET = (-34.0, 77.0)      # feet on the floor inside the wall: angle; radial extent, width, height
+WINDOW_FEET = (-6.0, 77.0)       # feet on the floor inside the wall: angle; radial extent, width, height
 FOOT_R0, FOOT_W, FOOT_H = 34.0, 4.0, 1.5
 PEG_D, PEG_L, PEG_R = 2.0, 1.0, 35.2   # pegs under the feet, in 2.1 x 1.2 mm holes drilled in the floor
 Z_FACE = 8.6                     # 0.6 mm over the board's 8.0, so every lid seal is a clamped gasket
@@ -204,7 +205,7 @@ DOOR_EDGE = 0.4                  # door beyond the land on each side
 DOOR_TONGUE = (37.2, 0.35)       # door tongues: inner radius, height into the grooves
 DOOR_GROOVE = (DOOR_FLOOR, 37.75, 0.45)   # grooves: r0, r1, height
 DOOR_CLEAR = 0.05                # door to pocket and groove faces
-DOOR_TRAVEL = 24.5               # degrees from closed to open, clockwise (towards 4 o'clock)
+DOOR_TRAVEL = 24.5               # degrees from closed to open, counter-clockwise (towards 2 o'clock)
 DOOR_GRIP = (0.3, 3)             # grip ribs on the outside: height, count
 # TPU plug (85A-95A) for the switch slot: a body pressed into the slot (PLUG_SQUEEZE oversize per side), a
 # flange on the scallop floor, and a strap to a pin glued into a blind hole in the shell.
@@ -216,10 +217,12 @@ SW_PLUG_IN = 36.6                            # body's inner face, 0.14 mm from t
 SW_PIN_Z = -2.9
 BATT_NOTCH = F["notches"][0]                 # (angle, width, depth): the board is notched; the wall gets a shallow groove
 # Lanyard: two 3 mm holes drilled square to the surface, one up from the back and one in from the side at
-# 6 o'clock, meeting in a boss inside the wall; the cord goes in at the side and out at the back.
+# 6 o'clock, meeting in a boss inside the wall; the cord goes in at the side and out at the back.  The back hole
+# stops LANYARD_REACH above the side hole's axis, so its drill point stays 0.7 mm under the boss's top.
 LANYARD_ANGLE, LANYARD_R, LANYARD_D, LANYARD_Z = 270.0, 35.3, 3.0, -6.2   # vertical hole's radius; side hole's Z
 LANYARD_BOSS, LANYARD_TOP = 3.2, -3.6        # boss radius (about the vertical hole) and top, 2 mm under the board
 LANYARD_SINK = 0.4                           # 45 degree countersink on both mouths
+LANYARD_REACH = 1.0
 DRILL_TIP = 0.5 / math.tan(math.radians(59)) # 118 degree point, per mm of diameter
 MOTOR_POCKET = F["motor"]["pocket"]
 # 915 MHz adhesive flex antenna (2J 2JF0515P, 39.9 x 7 mm) stuck to the inside of the plastic window, just outside
@@ -237,10 +240,11 @@ ORING_CS = 1.0
 LED_PIPE_D, LED_PIPE_BORE = 1.2, 1.4         # pipe, its bore in the skin
 LED_FOOT_D, LED_FOOT_Z0 = 1.6, 1.45          # thicker below the flange, 0.3 mm over the LED (top at 1.15)
 LED_TAB_W, LED_TAB_R = 4.0, 2.3              # tab width, round end about the pipe
-# The back carries only the Open Source Hardware logo, V-carved with a 90 degree bit to a flat depth: 45 degree walls
-# from the outline down to a flat floor, sharp outside corners.  Through the anodising it shows bare aluminium.
+# The back carries only the Open Source Hardware logo, engraved as a line: a 90 degree V-bit runs along its outline
+# (a contour, not a pocket) at VGROOVE_DEPTH, so the groove is twice that wide.  It cuts through the anodising and
+# shows bare aluminium.
 LOGO_SVG = os.path.join(CASE, "oshw_logo.svg")
-LOGO_W, VCARVE_DEPTH = 22.0, 0.4
+LOGO_W, VGROOVE_DEPTH, VGROOVE_OVER = 22.0, 0.3, 0.1   # the last: the model's walls run on past the surface
 # Proxies for what the board model does not contain.
 PH_PLUG, PH_MOUTH, PH_PLUG_OUT = (6.85, 5.8, 4.5), 4.4, 2.0   # PHR-2 housing (length, width, height); J2's mouth is 4.4 mm
                                              # along its +Y; the mated housing stands this far out of the mouth
@@ -512,10 +516,21 @@ def _inset(poly, d):
     return out
 
 
+def _corner(a, b, c, d):
+    """Where line a-b meets line c-d (the midpoint of b and c if they are near parallel)."""
+    r, q = (b[0] - a[0], b[1] - a[1]), (d[0] - c[0], d[1] - c[1])
+    den = r[0] * q[1] - r[1] * q[0]
+    if abs(den) < 1e-9 * math.hypot(*r) * math.hypot(*q):
+        return ((b[0] + c[0]) / 2, (b[1] + c[1]) / 2)
+    t = ((c[0] - a[0]) * q[1] - (c[1] - a[1]) * q[0]) / den
+    return (a[0] + t * r[0], a[1] + t * r[1])
+
+
 def logo_outline():
     """The OSHW logo as one counter-clockwise polygon in case XY about (0, 0), LOGO_W across, as seen from the back
-    (mirrored in X, keyhole towards 6 o'clock), simplified to 0.02 mm and cleared of the tiny corner arcs that a
-    V-bit cannot follow anyway (those would fold over in the inset)."""
+    (mirrored in X, keyhole towards 6 o'clock), simplified to 0.02 mm: the V-bit's path.  The source rounds its
+    corners with arcs far smaller than the groove; those become sharp corners (an edge whose offset by the groove's
+    half width would turn round is replaced by the meeting point of its neighbours)."""
     d = re.search(r'\sd="([^"]+)"', open(LOGO_SVG).read()).group(1)
     raw = max(svg_path_points(d), key=len)
     xs, ys = [p[0] for p in raw], [p[1] for p in raw]
@@ -533,32 +548,50 @@ def logo_outline():
             poly.append(p)
     if sum(poly[i - 1][0] * poly[i][1] - poly[i][0] * poly[i - 1][1] for i in range(len(poly))) < 0:
         poly.reverse()
-    while True:                              # drop vertices whose edges the inset would turn round
-        ins = _inset(poly, VCARVE_DEPTH)
+    r = VGROOVE_DEPTH + VGROOVE_OVER
+    while True:
         n = len(poly)
-        flipped = [i for i in range(n) if
-                   (poly[(i + 1) % n][0] - poly[i][0]) * (ins[(i + 1) % n][0] - ins[i][0]) +
-                   (poly[(i + 1) % n][1] - poly[i][1]) * (ins[(i + 1) % n][1] - ins[i][1]) <=
-                   0.25 * math.dist(poly[i], poly[(i + 1) % n]) * math.dist(ins[i], ins[(i + 1) % n])]
+        flipped = [i for o in (_inset(poly, r), _inset(poly, -r)) for i in range(n) if
+                   (poly[(i + 1) % n][0] - poly[i][0]) * (o[(i + 1) % n][0] - o[i][0]) +
+                   (poly[(i + 1) % n][1] - poly[i][1]) * (o[(i + 1) % n][1] - o[i][1]) <=
+                   0.25 * math.dist(poly[i], poly[(i + 1) % n]) * math.dist(o[i], o[(i + 1) % n])]
         if not flipped:
-            return poly, ins
+            return poly
         i = flipped[0]
-        j = i if math.dist(poly[i - 1], poly[i]) < math.dist(poly[(i + 1) % n], poly[(i + 2) % n]) else (i + 1) % n
+        j = (i + 1) % n
+        c = _corner(poly[i - 1], poly[i], poly[j], poly[(j + 1) % n])
+        poly[i] = c
         del poly[j]
 
 
-def oshw_vcarve():
-    """The V-carved logo as a solid to cut from the back: a ruled loft from the outline on the surface to the outline
-    inset by the depth on the flat floor (90 degree bit: 45 degree walls), on a prism below the surface."""
-    poly, ins = logo_outline()
-    w0 = Part.makePolygon([V(CX + x, CY + y, Z_BOTTOM) for x, y in poly + poly[:1]])
-    w1 = Part.makePolygon([V(CX + x, CY + y, Z_BOTTOM + VCARVE_DEPTH) for x, y in ins + ins[:1]])
-    return Part.makeLoft([w0, w1], True, True).fuse(Part.Face(w0).extrude(V(0, 0, -1)))
+def oshw_vgroove():
+    """The engraved logo as a solid to cut from the back: a 90 degree V-bit's groove with its tip VGROOVE_DEPTH deep on
+    the outline, its walls carried VGROOVE_OVER past the surface.  Planar faces: each wall is the outline offset by the
+    groove's half width at the top, ruled down to the outline at the tip (sharp corners, where a real bit rounds the
+    groove's outer edge by its half width)."""
+    poly = logo_outline()
+    r = VGROOVE_DEPTH + VGROOVE_OVER
+    z_tip, z_top = Z_BOTTOM + VGROOVE_DEPTH, Z_BOTTOM - VGROOVE_OVER
+    def ring(pts, z):
+        return [V(CX + x, CY + y, z) for x, y in pts]
+    tip, out, inn = ring(poly, z_tip), ring(_inset(poly, -r), z_top), ring(_inset(poly, r), z_top)
+    faces = []
+    for i in range(len(poly)):
+        j = (i + 1) % len(poly)
+        faces.append(Part.Face(Part.makePolygon([out[i], out[j], tip[j], tip[i], out[i]])))
+        faces.append(Part.Face(Part.makePolygon([inn[i], tip[i], tip[j], inn[j], inn[i]])))
+    faces.append(Part.Face(Part.makePolygon(out + out[:1])).cut(Part.Face(Part.makePolygon(inn + inn[:1]))).Faces[0])
+    shell = Part.Shell(faces)
+    shell.sewShape()
+    groove = Part.Solid(shell)
+    if groove.Volume < 0:
+        groove.reverse()
+    return groove
 
 
 def write_logo_template(path):
-    """1:1 SVG of the logo as it is carved, seen from the back, for the engraver."""
-    poly, ins = logo_outline()
+    """1:1 SVG of the logo's engraving path, seen from the back, for the machinist."""
+    poly = logo_outline()
     m = 6.0
     w = LOGO_W + 2 * m
     def d(p):
@@ -567,10 +600,12 @@ def write_logo_template(path):
         w + 40, w + 14, w + 40, w + 14),
         '<text x="2" y="4" font-family="sans-serif" font-size="2.5">Finder Puck back: OSHW logo, 1:1, seen from the '
         "back, centred on the case axis, 12 o'clock up</text>",
-        '<text x="2" y="%.1f" font-family="sans-serif" font-size="2.2">V-carve with a 90 deg bit to a %.2f mm flat depth '
-        '(outer line on the surface, inner line the floor)</text>' % (w + 11, VCARVE_DEPTH),
-        '<path d="%s" fill="none" stroke="black" stroke-width="0.08"/>' % d(poly),
-        '<path d="%s" fill="none" stroke="grey" stroke-width="0.05"/>' % d(ins),
+        '<text x="2" y="%.1f" font-family="sans-serif" font-size="2.2">V-groove (contour, not pocket): 90 deg V-bit, tip '
+        'on the black line, %.2f mm deep, so %.2f mm wide (grey). Engrave after anodising.</text>' % (
+            w + 11, VGROOVE_DEPTH, 2 * VGROOVE_DEPTH),
+        '<path d="%s" fill="none" stroke="#bbb" stroke-width="%.2f" stroke-linejoin="round"/>' % (
+            d(poly), 2 * VGROOVE_DEPTH),
+        '<path d="%s" fill="none" stroke="black" stroke-width="0.05"/>' % d(poly),
         '<path d="M %.1f %.1f h 10" stroke="black" stroke-width="0.2"/><text x="%.1f" y="%.1f" font-family="sans-serif" '
         'font-size="2.2">10 mm</text>' % (w + 4, w / 2 + 6, w + 15, w / 2 + 6.8),
         "</svg>"]
@@ -664,7 +699,7 @@ def make_shell():
     # Lanyard: up from the back and in from the side, meeting in the boss.
     lx, ly = at(LANYARD_ANGLE, LANYARD_R)
     up, mouth = V(0, 0, 1), V(lx, ly, Z_BOTTOM)
-    body = body.cut(drill(mouth - up, up, LANYARD_D, LANYARD_Z + LANYARD_D / 2 - Z_BOTTOM + 1))
+    body = body.cut(drill(mouth - up, up, LANYARD_D, LANYARD_Z + LANYARD_REACH - Z_BOTTOM + 1))
     body = body.cut(countersink(mouth, up, LANYARD_D, LANYARD_SINK))
     inward = V(-math.cos(math.radians(LANYARD_ANGLE)), -math.sin(math.radians(LANYARD_ANGLE)), 0)
     side = V(*at(LANYARD_ANGLE, R_OUT), LANYARD_Z)
@@ -677,13 +712,14 @@ def make_shell():
     body = body.cut(local_box(a, R_OUT - SCALLOP_D, R_OUT + 2, -SCALLOP_W / 2, SCALLOP_W / 2, SCALLOP_Z0, SCALLOP_Z1,
                               SCALLOP_RC))
     body = body.cut(radial_pin(a, R_OUT - SCALLOP_D - PLUG_PIN_L + 0.4, R_OUT, PLUG_PIN_D, SW_PIN_Z))
-    # Battery lead: the board is notched here; the bay's wall gets a slot the cables stand in, floor to rim.
+    # Battery lead: the board is notched here; the bay's wall gets a slot the cables stand in, floor to ledge, out
+    # to the board's bore (anything beyond it would be an undercut under the rim), with 1.5 mm inside corners.
     angle, width, _ = BATT_NOTCH
-    slot = Part.makeBox(R_IN + 0.3 - (R_BAY - 0.5), width, 2.0 - Z_FLOOR, V(R_BAY - 0.5, -width / 2, Z_FLOOR))
-    slot = slot.makeFillet(1.5, [e for e in slot.Edges if abs(e.tangentAt(e.FirstParameter).z) > 0.99
-                                 and e.BoundBox.XMin > R_BAY])
-    slot.rotate(V(0, 0, 0), V(0, 0, 1), angle)
-    slot.translate(V(CX, CY, 0))
+    half = deg(width / 2, R_IN)
+    slot = arc(R_BAY - 0.5, R_IN, angle - half, angle + half, Z_FLOOR, -T_BOARD + 0.5)
+    slot = slot.makeFillet(1.5, [e for e in slot.Edges if e.BoundBox.ZLength > 1.0 and e.BoundBox.XLength < 1e-3
+                                 and e.BoundBox.YLength < 1e-3 and math.hypot(e.BoundBox.XMin - CX,
+                                                                             e.BoundBox.YMin - CY) > R_IN - 0.01])
     body = body.cut(slot)
     # Motor pocket: a shallow recess in the floor.  Holes for the window's pegs.
     mx, my = pt(*MOTOR_POCKET)
@@ -691,7 +727,7 @@ def make_shell():
     for a in WINDOW_FEET:
         body = body.cut(cyl(PEG_D / 2 + 0.05, Z_FLOOR - PEG_L - 0.2, Z_FLOOR + 0.01, *at(a, PEG_R)))
     # The OSHW logo on the back.
-    body = body.cut(oshw_vcarve())
+    body = body.cut(oshw_vgroove())
     return largest_solid(body.removeSplitter())
 
 
@@ -937,7 +973,7 @@ def door_pocket():
     a = F["usb"]["angle"]
     _, door_h = door_extent()
     _, _, (pz0, pz1) = door_z()
-    a0, a1 = a - door_h - DOOR_TRAVEL - deg(DOOR_CLEAR), a + door_h + deg(DOOR_CLEAR)
+    a0, a1 = a - door_h - deg(DOOR_CLEAR), a + door_h + DOOR_TRAVEL + deg(DOOR_CLEAR)
     g0, g1, gh = DOOR_GROOVE
     pocket = arc(DOOR_FLOOR, R_OUT + 1, a0, a1, pz0, pz1, steps=80)
     pocket = pocket.fuse([arc(g0, g1, a0, a1, pz1 - 0.01, pz1 + gh, steps=80),
@@ -947,7 +983,7 @@ def door_pocket():
 
 def make_door(travel=0.0):
     """The USB-C door, closed (travel 0) or slid open by travel degrees."""
-    a = F["usb"]["angle"] - travel
+    a = F["usb"]["angle"] + travel
     _, door_h = door_extent()
     _, (z0, z1), _ = door_z()
     r_t, h_t = DOOR_TONGUE
@@ -965,7 +1001,7 @@ def make_door(travel=0.0):
 
 def make_door_gasket(travel=0.0):
     """The die-cut foam frame on the door's inside, drawn squeezed onto the land (closed)."""
-    a = F["usb"]["angle"] - travel
+    a = F["usb"]["angle"] + travel
     land_h, _ = door_extent()
     (z0, z1), _, _ = door_z()
     r0 = DOOR_LAND if travel == 0 else DOOR_IN - DOOR_GASKET
@@ -1215,7 +1251,7 @@ def main():
             name, mesh.CountFacets, "closed" if mesh.isSolid() else "NOT closed", crossings, flag))
     Import.export([objs[n] for n in printed], os.path.join(CASE, NAME + "_case.step"))
     write_gasket_template(os.path.join(CASE, NAME + "_gaskets.svg"))
-    write_logo_template(os.path.join(CASE, NAME + "_logo_vcarve.svg"))
+    write_logo_template(os.path.join(CASE, NAME + "_logo_vgroove.svg"))
     print("wrote", out)
 
 
