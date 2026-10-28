@@ -287,7 +287,9 @@ next step.
 |---|---|---|---|
 | Seam seal, window strip | 1 + 1 | 1.0 mm PORON 4701-15 Soft Seal (made for dust and water gaskets), or 1/32" (0.8 mm) closed-cell neoprene/EPDM sponge with adhesive as a stopgap (25 % squeeze instead of 40 %) | Rogers samples, or a converter (TBP Converting, Stockwell Elastomerics, JBC Technologies) |
 | Door frame | 1 | 0.5 mm PORON 4701-30 Very Soft (0.53 mm supported) | converter, as above |
-| Lid and crystal gaskets | 1 + 1 | 0.3 mm: the only 0.30 mm PORON is 4701-50 Firm-Thin (about 32 psi at 25 %, ±0.08 mm thick); see below | converter, as above |
+| Crystal gasket | 1 | 0.30 mm PORON 4701-50 Firm-Thin (about 32 psi at 25 %, ±0.08 mm thick) | converter, as above |
+| Lid gasket | 1 | 0.3 mm: the softest closed-cell foam a converter has at that thickness, else 4701-50 Firm-Thin; see below | converter, as above |
+| Foam ring under the ring (not a seal, but in the lid's force path) | 1 | 0.5 mm PORON 4701-50 Firm (0.51 mm) | converter, as above |
 | O-ring | 1 | 9 × 1 mm silicone, 70A (RS PRO 772-044, bag of 50) | RS, TME, any metric O-ring stockist |
 | Washers | 4 | DIN 433 M2.5 nylon, 2.7 × 5 × 0.5 mm | Accu, TME, Bossard, Essentra |
 
@@ -295,14 +297,14 @@ Converters cut from `case/finder_puck_gaskets.dxf` with a knife plotter or laser
 three pucks, the 1:1 SVG and a sharp blade do too. Adhesive: none on the lid, crystal and seam gaskets, which are
 clamped; a thin acrylic PSA on the window strip and the door frame helps assembly.
 
-**The lid stack needs a look before ordering the 0.3 mm gaskets.** The bezel stands on the ring, so the lid gasket
-(about 530 mm²) and the 0.5 mm foam ring under the ring (58 mm²) carry the same bolt force in series, and share
-the 0.35 mm of squeeze the parts leave them. In one foam the ring's foam, with a ninth of the area, takes nearly
-all of it and the lid gasket only about 0.05 mm, less than the ±0.08 mm thickness tolerance of 0.3 mm stock. A
-firm foam ring (PORON 4701-50, 0.51 mm, about ten times stiffer than 4701-30) under a very soft lid gasket
-balances it; a thicker, very soft lid gasket in a deeper pocket fixes it properly. The crystal gasket is not in
-that chain: the crystal sits on the ring as the bezel does, so its 0.1 mm squeeze is set by the crystal's and the
-bezel's thickness tolerances, which a converter's ±0.08 mm stock and a resin print can use up between them.
+**The lid stack.** The bezel stands on the ring, so the lid gasket (about 530 mm²) and the 0.5 mm foam ring under
+the ring (58 mm²) carry the same bolt force in series, and share the 0.35 mm of squeeze the parts leave them. In
+one foam the ring's foam, with a ninth of the area, would take nearly all of it and the lid gasket only about
+0.05 mm. So the foam ring is firm PORON 4701-50 (0.51 mm), and the lid gasket is the softest 0.3 mm foam to be had.
+No very soft PORON is made that thin, so the lid gasket's squeeze stays small: check it on the first puck (a strip
+of paper under the gasket should be held all round once the bolts are in) and in the hose test. A 0.5 mm very soft
+lid gasket in a pocket 0.2 mm deeper is the fix if it leaks. The crystal gasket is not in that chain: the crystal
+sits on the ring as the bezel does, so its 0.1 mm squeeze is set by the crystal's and the bezel's thickness.
 
 ## Renders
 

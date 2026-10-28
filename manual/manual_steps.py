@@ -39,7 +39,7 @@ PARTS = {
     "antenna": ("electronics", "915 MHz antenna", 1, "adhesive flex 40 × 7 mm (2J 2JF0515P), U.FL", "card_antenna"),
     "bolt":    ("hardware", "Bolt M2.5 × 12", 4, "socket cap, aluminium (non-magnetic)", "card_bolt"),
     "index":   ("hardware", "Index stub", 1, "orange 1.75 mm filament, trim flush", "card_index"),
-    "foamring": ("hardware", "Foam ring", 1, "0.5 mm, Ø36.3–38 mm, open 10 to 5 o'clock", "card_foamring"),
+    "foamring": ("hardware", "Foam ring", 1, "0.5 mm firm foam (PORON 4701-50), Ø36.3–38 mm, open 10 to 5 o'clock", "card_foamring"),
     "gasket":  ("hardware", "Gasket", 1, "0.3 mm foam, Ø32.5–35 mm", "card_gasket"),
     "pad":     ("hardware", "Battery pad", 1, "0.5 mm foam, 34 × 50 mm", "card_pad"),
     "sheet":   ("hardware", "Insulation sheet", 1, "0.2 mm Kapton or PET, 36 × 52 mm", "card_sheet"),
