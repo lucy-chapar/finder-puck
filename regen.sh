@@ -11,6 +11,8 @@ if [ "$1" != "--case-only" ]; then
     "$KICAD_PY" -u tools/generate_puck.py
 fi
 "$FREECADCMD" case/build_case.py 2>&1 | grep -E "overlap|squeeze|door open|gap |rf:|window gasket|mesh |case:|CHECK|wrote|Error|Traceback"
+# Shop files: the shell and window as single STEPs, the shell's drawing and the gaskets' DXF.
+"$FREECADCMD" case/shop_drawing.py 2>&1 | grep -E "wrote|CHECK|Error|Traceback"
 rm -rf case/__pycache__
 # Previews need the FreeCAD GUI; it opens and closes a window.
 open -n -a /Applications/FreeCAD.app --args "$PWD/case/render_case.py"

@@ -32,10 +32,11 @@ jets from any direction) with the USB-C door slid shut and the switch plug pushe
 | `fab/finder_puck_bom.csv`, `fab/finder_puck_cpl.csv` | Assembly BOM and placement (JLCPCB column names) |
 | `mech/finder_puck.step`, `mech/finder_puck_features.json` | Populated board in 3D, and everything the case needs from it |
 | `case/finder_puck_case.FCStd` | FreeCAD assembly: board, panel, crystal, battery, motor, antenna, bolts, shell, window, plate, ring, bezel, cap |
-| `case/finder_puck_case.step` | All made parts in STEP: the machine shop quotes the shell from this |
+| `case/finder_puck_case.step` | All made parts in STEP |
+| `case/finder_puck_{shell,window}_shop.step`, `case/finder_puck_shell_drawing.pdf` | For the shop: the shell and the window each on its own, origin on the axis at the back face, and the shell's A3 drawing (threads, tolerances, finish, setups) |
 | `case/finder_puck_{window,plate,ring,bezel,cap}.stl` | Print files (`finder_puck_shell.stl` too, for previews) |
 | `case/finder_puck_logo_vgroove.svg`, `case/oshw_logo.svg` | 1:1 drawing of the back logo's V-groove path for the machinist; the logo's source path (Simple Icons, CC0) |
-| `case/finder_puck_gaskets.svg` | 1:1 cutting template for the lid, crystal and door gaskets |
+| `case/finder_puck_gaskets.svg`, `case/finder_puck_gaskets.dxf` | 1:1 cutting template for the lid, crystal and door gaskets; the same plus the seam seal and window strip as a DXF for a converter's cutter (a layer per foam thickness) |
 | `case/finder_puck_{door,switchplug}.stl` | The sliding USB-C door and the TPU switch plug |
 | `docs/finder_puck_build_guide.pdf` | Step-by-step assembly guide (IKEA style) |
 | `manual/` | The guide's content, renderer and layout scripts |
@@ -202,7 +203,8 @@ higher on the window before anything else.
 
 ### Machining the shell
 
-`case/finder_puck_case.step` holds the shell as a solid; quote it as 6061-T6, Type II black anodise (MIL-A-8625
+Send the shop `case/finder_puck_shell_shop.step`, `case/finder_puck_shell_drawing.pdf` and
+`case/finder_puck_logo_vgroove.svg` (`case/shop_drawing.py` writes the first two from the build); quote it as 6061-T6, Type II black anodise (MIL-A-8625
 Type II, class 2, about 10–15 µm), ±0.05 mm on the two bores, the bosses' faces and the flanks, ±0.1 mm elsewhere,
 and with these notes:
 
@@ -217,7 +219,8 @@ and with these notes:
   (60°) edges where they meet the outside and the rim.
 - Smallest tool: 2 mm (the switch slot's 1 mm corners); bosses meet the bay wall with 1.5 mm radii, and so do the
   6 mm wide cable slot's corners (a 3 mm cutter, 6.3 mm deep). Wall 1.8 mm, floor 1.8 mm; no undercuts.
-- Mask the tapped holes and the seal faces (rim, notch floor, flanks) from anodising, or chase the threads after.
+- Mask the tapped holes from anodising, or chase the threads after. The seal faces (rim, notch floor, flanks) stay
+  anodised: the foam seals as well on the oxide, and masking them would only add cost.
 - Engrave the logo after anodising: a V-groove along its outline (contour, not pocket), 90° V-bit, tip 0.3 mm deep
   on the line, 0.6 mm wide at the surface (`case/finder_puck_logo_vgroove.svg`, centred on the case axis,
   12 o'clock up when you look at the back), so it reads as a bare aluminium line. Cut before anodising, it would come
@@ -268,15 +271,38 @@ IP55 is dust protected (no harmful deposit) and water jets from any direction (I
 
 Nothing is glued or potted: the lid (plate, bezel, crystal, cap) comes off as one piece with the four bolts, so
 the panel stays reachable, and the gaskets are cut again from the 1:1 template `case/finder_puck_gaskets.svg`
-(lid and crystal gaskets, and the door's frame flat) when they take a set. The crystal gasket, the lid gasket and
-the 0.5 mm foam ring under the ring are squeezed in series by the bolted stack (the plate's bosses fix the total),
-so the two gaskets want a soft, low-set foam (PORON or a soft PE/EPDM) at least as soft as the foam ring; a
+(lid and crystal gaskets, and the door's frame flat) when they take a set. The lid gasket and the
+0.5 mm foam ring under the ring are squeezed in series by the bolted stack (the plate's bosses fix the total),
+so the lid gasket wants a much softer foam than the ring's (see "Sourcing the seals"); a
 black crystal gasket shows as a thin dark line through the clear lip, a white or clear one does not. Nothing has been tested yet: the rating is what the design aims at. To check a built puck, put a
 dry tissue inside, close it, and spray it from 2.5–3 m with a hose and a 6.3 mm nozzle (a 12.5 l/min flow)
 for 3 minutes, turning it to reach every face, then open it; for dust, shake it in a bag of talc. The design
 has no pressure vent: a sealed puck that goes from a hot car into cold water pulls a little vacuum, so if
 water gets in only after big temperature swings, an adhesive ePTFE vent over a small hole in the floor is the
 next step.
+
+### Sourcing the seals
+
+| Seal | Qty | Material | Where |
+|---|---|---|---|
+| Seam seal, window strip | 1 + 1 | 1.0 mm PORON 4701-15 Soft Seal (made for dust and water gaskets), or 1/32" (0.8 mm) closed-cell neoprene/EPDM sponge with adhesive as a stopgap (25 % squeeze instead of 40 %) | Rogers samples, or a converter (TBP Converting, Stockwell Elastomerics, JBC Technologies) |
+| Door frame | 1 | 0.5 mm PORON 4701-30 Very Soft (0.53 mm supported) | converter, as above |
+| Lid and crystal gaskets | 1 + 1 | 0.3 mm: the only 0.30 mm PORON is 4701-50 Firm-Thin (about 32 psi at 25 %, ±0.08 mm thick); see below | converter, as above |
+| O-ring | 1 | 9 × 1 mm silicone, 70A (RS PRO 772-044, bag of 50) | RS, TME, any metric O-ring stockist |
+| Washers | 4 | DIN 433 M2.5 nylon, 2.7 × 5 × 0.5 mm | Accu, TME, Bossard, Essentra |
+
+Converters cut from `case/finder_puck_gaskets.dxf` with a knife plotter or laser, without tooling; for two or
+three pucks, the 1:1 SVG and a sharp blade do too. Adhesive: none on the lid, crystal and seam gaskets, which are
+clamped; a thin acrylic PSA on the window strip and the door frame helps assembly.
+
+**The lid stack needs a look before ordering the 0.3 mm gaskets.** The bezel stands on the ring, so the lid gasket
+(about 530 mm²) and the 0.5 mm foam ring under the ring (58 mm²) carry the same bolt force in series, and share
+the 0.35 mm of squeeze the parts leave them. In one foam the ring's foam, with a ninth of the area, takes nearly
+all of it and the lid gasket only about 0.05 mm, less than the ±0.08 mm thickness tolerance of 0.3 mm stock. A
+firm foam ring (PORON 4701-50, 0.51 mm, about ten times stiffer than 4701-30) under a very soft lid gasket
+balances it; a thicker, very soft lid gasket in a deeper pocket fixes it properly. The crystal gasket is not in
+that chain: the crystal sits on the ring as the bezel does, so its 0.1 mm squeeze is set by the crystal's and the
+bezel's thickness tolerances, which a converter's ±0.08 mm stock and a resin print can use up between them.
 
 ## Renders
 

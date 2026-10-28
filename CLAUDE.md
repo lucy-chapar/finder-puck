@@ -46,7 +46,7 @@ vendored as `tools/kicad_helpers.py`; its own Digital Sand paths are unused or o
   free of overlap, and its `mesh`
   lines must say closed, 0 self-intersections. IP55 depends on every seal in README "Sealing (IP55)"; a change
   that opens a new path into the case (an opening across the seam, a through hole) needs a seal of its own, a clamped
-  gasket or O-ring rather than glue (the lid must stay serviceable). The script only builds when run as `build_case.py` (freecadcmd never sets
+  gasket or O-ring rather than glue (the lid must stay serviceable). `case/shop_drawing.py` (freecadcmd, after the build) writes the shop STEPs, the shell drawing (PDF through Chrome) and the gasket DXF; it must say `valid` for both STEPs. The script only builds when run as `build_case.py` (freecadcmd never sets
   `__main__`); the renderers import it for the parameters. Previews need the FreeCAD GUI:
   `open -n -a FreeCAD --args <abs path>/case/render_case.py`.
 - Build guide: `manual/manual_steps.py` is the content (parts, tools, steps), `manual/render_manual.py` makes the
